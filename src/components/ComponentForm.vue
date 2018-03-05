@@ -21,8 +21,17 @@ export default {
   },
   methods: {
     submit() {
+      this.loading = true;
 
+      // Save Comment
+      this.$vueJsonp('http://localhost:3434', { username: 'DefaultName', message: this.data }).then(json => {
+        // Success.
+        this.loading = false;
+      }).catch(err => {
+        // Failed.
+        this.loading = false;
+      })
     }
   }
-}
+};
 </script>
