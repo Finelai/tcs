@@ -3,9 +3,10 @@
     <header>
       <div class="header-wrapper">
         <nav>
-          <router-link to="/">Top Comment System</router-link>
+          <router-link :to="{ name: 'StreamPage' }">Stream Page</router-link>
           <router-link :to="{ name: 'SignUp' }">SignUp</router-link>
           <router-link :to="{ name: 'Login' }">Login</router-link>
+          <router-link :to="{ name: 'UserProfile' }">Profile</router-link>
           <router-link :to="{ name: 'ComponentForm' }">Comment Form</router-link>
         </nav>
       </div>

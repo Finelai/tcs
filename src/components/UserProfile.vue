@@ -12,7 +12,7 @@ export default {
   name: 'hello',
   data () {
     return {
-      msg: 'Welcome to TCS, '
+      msg: 'Welcome to TCS, ' + firebase.auth().currentUser.email
     }
   },
   methods: {
