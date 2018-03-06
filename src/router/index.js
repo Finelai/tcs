@@ -39,7 +39,7 @@ const router = new Router({
       component: SignUp,
     },
     {
-      path: '/user',
+      path: '/user/:userId',
       name: 'UserProfile',
       component: UserProfile,
       meta: {
@@ -50,17 +50,27 @@ const router = new Router({
       path: '/form',
       name: 'ComponentForm',
       component: ComponentForm,
+      meta: {
+        requiresAuth: true,
+      },
     },
   ],
 });
 
 router.beforeEach((to, from, next) => {
+  // Check if firebase detect user id
   const currentUser = firebase.auth().currentUser;
+  // Check if current link auth required
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-  if (requiresAuth && !currentUser) next('login')
-  else if (!requiresAuth && currentUser) next('user')
-  else next()
+  // Check auth required and this is not a user - > redirect to login
+  if (requiresAuth && !currentUser) {
+    next('login');
+  } else if (!requiresAuth && currentUser) {
+    router.push({ name: 'UserProfile', params: { userId: currentUser.uid } });
+  } else {
+    next();
+  }
 });
 
 export default router;
