@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'StreamPage',
   data() {
     return {
       msg: 'Welcome to Your Vue.js App',

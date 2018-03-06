@@ -4,8 +4,11 @@
 - webpack
 - vue
 - vuex
+- jsonp
+- firebase
 
 ### structure:
+- - [ ] **sign-up & login** (создание аккаунта и вход с использованием firebase)
 - - [ ] **stream list** (только активные стримы)
 - - [ ] **create stream** (создание стрима с возможностью вставить url и последующее управление)
 - - [ ] **stream page** (страница с запущенным стримом)
