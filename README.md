@@ -21,3 +21,16 @@
 - - [ ] **user profile** (страница пользователя с рейтингом)
   - - [ ] **top user comments by streamer** (список комментариев, которые находятся в топе у стримеров, упорядоченных по стримерам)
 - - [ ] **about** (как пользоваться сервисом)
+
+
+#### firebase config
+
+Чтобы подключить к проекту базу данных firebase необходимо создать файл firebase.js в папке config следующего содержания:
+>export default {
+>  apiKey: 'YOURPROJECT Api Key',
+>  authDomain: 'YOURPROJECT.firebaseapp.com',
+>  databaseURL: 'https://YOURPROJECT.firebaseio.com',
+>  projectId: 'YOURPROJECTID',
+>  storageBucket: 'YOURPROJECT.appspot.com',
+>  messagingSenderId: 'YOURPROJECT',
+>};
