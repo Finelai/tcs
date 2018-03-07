@@ -28,7 +28,17 @@ export default {
   },
   created: function() {
     if ( firebase.auth().currentUser ) {
-      (!this.$route.params.userId) ? this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } }) : false;
+
+      if (!this.$route.params.userId) {
+        this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } })
+      } else if (this.$route.params.userId !== firebase.auth().currentUser.uid) {
+        var userId = firebase.auth().currentUser.uid;
+        return firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
+          var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
+          console.log(username);
+        });
+      }
+
     }
   },
   mounted: function() {

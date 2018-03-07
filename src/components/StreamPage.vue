@@ -36,7 +36,7 @@ export default {
   name: 'StreamPage',
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App',
+      msg: 'Welcome to Stream',
     };
   },
 };
