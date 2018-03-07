@@ -20,7 +20,7 @@
 
     <div>
       <ul>
-        <li v-for="userName of names" v-bind:key="userName['.key']">
+        <li v-for="userName of users" v-bind:key="userName['.key']">
           <div v-if="!userName.edit">
             <p>{{ userName }}</p>
             <button @click="removeName(userName['.key'])">Remove</button>
@@ -40,39 +40,41 @@
 </template>
 
 <script>
-import { namesRef } from '../config/firebase';
+import { usersRef } from '../config/firebase';
 
 export default {
   data() {
     return {
-      name: ''
-    }
+      name: '',
+    };
   },
   firebase: {
-    names: namesRef
+    // сортируем по рейтингу
+    users: usersRef.orderByChild('raiting'),
   },
   methods: {
     submitName() {
-      namesRef.push({
+      usersRef.push({
         name: this.name,
-        edit: false
+        edit: false,
+        raiting: 0,
       });
       this.name = '';
-      this.$toaster.success('New user added to database.')
+      this.$toaster.success('New user added to database.');
     },
     removeName(key) {
-      namesRef.child(key).remove();
+      usersRef.child(key).remove();
     },
     setEditName(key) {
-      namesRef.child(key).update({ edit: true });
+      usersRef.child(key).update({ edit: true });
     },
     cancelEdit(key) {
-      namesRef.child(key).update({ edit: false });
+      usersRef.child(key).update({ edit: false });
     },
     saveEdit(person) {
       const key = person['.key'];
-      namesRef.child(key).set({ name: person.name, edit: false })
-    }
-  }
+      usersRef.child(key).set({ name: person.name, edit: false });
+    },
+  },
 };
 </script>

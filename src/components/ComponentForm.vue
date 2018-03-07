@@ -16,8 +16,8 @@ export default {
   data() {
     return {
       loading: false,
-      data: {}
-    }
+      data: {},
+    };
   },
   methods: {
     submit() {
@@ -30,8 +30,8 @@ export default {
       }).catch(err => {
         // Failed.
         this.loading = false;
-      })
-    }
-  }
+      });
+    },
+  },
 };
 </script>

@@ -9,30 +9,30 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase';
 
 export default {
   name: 'login',
-  data: function() {
+  data() {
     return {
       email: '',
-      password: ''
-    }
+      password: '',
+    };
   },
   methods: {
-    signIn: function() {
+    signIn() {
       firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          this.$router.push({ 
+          this.$router.push({
             name: 'UserProfile',
-            params: { userId: user.uid } 
+            params: { userId: user.uid },
           });
         },
         (err) => {
-          alert('Oops. ' + err.message)
-        }
+          this.$toaster.error('Try again.');
+        },
       );
-    }
-  }
-}
+    },
+  },
+};
 </script>
