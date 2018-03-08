@@ -55,14 +55,24 @@ export default {
   },
   methods: {
     submitName() {
-      this.$firebaseRefs.users.push({
+      // this.$firebaseRefs.users.push({
+      //   name: this.name,
+      //   edit: false,
+      //   raiting: 0,
+      //   id: firebase.auth().currentUser.uid,
+      // });
+      const postData = {
         name: this.name,
-        edit: false,
-        raiting: 0,
         id: firebase.auth().currentUser.uid,
-      });
+        raiting: 0,
+      };
+
+      let updates = {};
+      updates[`/users/${postData.id}`] = postData;
+
       this.name = '';
       this.$toaster.success('New user added to database.');
+      return db.ref().update(updates);
     },
     removeName(key) {
       usersRef.child(key).remove();

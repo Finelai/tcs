@@ -11,7 +11,7 @@
 
 <script>
 import firebase from 'firebase';
-import { usersRef } from '../../config/firebase';
+import { db } from '../../config/firebase';
 
 export default {
   name: 'signUp',
@@ -26,21 +26,17 @@ export default {
     signUp() {
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          // записываем данные нового юзера в бд и получаем ключ
-          const newUserKey = usersRef.push({
+          // записываем данные нового юзера в бд
+          const newUserData = {
             name: this.name,
             id: user.uid,
             raiting: 0,
-          }).key;
+          };
 
-          // обновляем профиль указав ключ в поле displayName
-          firebase.auth().currentUser.updateProfile({
-            displayName: newUserKey,
-          }).then(() => {
-            this.$toaster.success('Вы успешно сменили имя');
-          }).catch((err) => {
-            this.$toaster.error(`Error: ${err.message}`);
-          });
+          let updates = {};
+          updates[`/users/${newUserData.id}`] = newUserData;
+
+          db.ref().update(updates);
 
           this.$toaster.success(`Добро Пожаловать, ${this.name}`);
           this.$router.replace('user');

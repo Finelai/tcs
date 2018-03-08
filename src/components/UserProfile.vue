@@ -45,11 +45,13 @@ export default {
     if (firebase.auth().currentUser && !this.$route.params.userId) {
       this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
     }
+    // а если в базе данных у этого пользователя создана запись link, то пушем не id пользователя а link
+    // после чего берем this.$route.params.userId и ищем в бд пользователя с таким id, после чего получаем его данные в объекте
   },
   mounted() {
     // проверка задано ли у пользователя отображаемое имя
-    if (firebase.auth().currentUser.displayName) {
-      this.$bindAsObject('user', usersRef.child(firebase.auth().currentUser.displayName));
+    if (firebase.auth().currentUser.uid) {
+      this.$bindAsObject('user', usersRef.child(firebase.auth().currentUser.uid));
       this.userName = this.user.name;
     }
 
