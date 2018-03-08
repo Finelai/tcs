@@ -41,12 +41,8 @@ export default {
   },
   created() {
     // отображение ссылки пользователя
-    if (firebase.auth().currentUser) {
-      if (!this.$route.params.userId) {
-        this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
-      } else if (this.$route.params.userId !== firebase.auth().currentUser.uid) {
-        const userId = firebase.auth().currentUser.uid;
-      }
+    if (firebase.auth().currentUser && !this.$route.params.userId) {
+      this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
     }
   },
   mounted() {

@@ -40,7 +40,9 @@
 </template>
 
 <script>
-import { usersRef } from '../config/firebase';
+import { usersRef, db } from '../config/firebase';
+import firebase from 'firebase';
+
 
 export default {
   data() {
@@ -54,10 +56,11 @@ export default {
   },
   methods: {
     submitName() {
-      usersRef.push({
+      this.$firebaseRefs.users.push({
         name: this.name,
         edit: false,
         raiting: 0,
+        id: firebase.auth().currentUser.uid,
       });
       this.name = '';
       this.$toaster.success('New user added to database.');
