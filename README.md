@@ -28,12 +28,17 @@
 Чтобы подключить к проекту базу данных firebase необходимо создать файл **firebase.js** в папке **config** следующего содержания:
 
 ```
-export default {
+import { initializeApp } from 'firebase';
+
+const app = initializeApp({
   apiKey: 'YOURPROJECT Api Key',
   authDomain: 'YOURPROJECT.firebaseapp.com',
   databaseURL: 'https://YOURPROJECT.firebaseio.com',
   projectId: 'YOURPROJECTID',
   storageBucket: 'YOURPROJECT.appspot.com',
   messagingSenderId: 'YOURPROJECT',
-};
+});
+
+export const db = app.database();
+export const usersRef = db.ref('users');
 ```
