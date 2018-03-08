@@ -25,12 +25,13 @@
 
 <script>
 import firebase from 'firebase';
+import { usersRef, db } from '../../config/firebase';
 
 export default {
   name: 'UserProfile',
   data() {
     return {
-      userName: firebase.auth().currentUser.email.replace(/@[^@]+$/, ''),
+      userName: '',
       updateName: '',
       editName: false,
       editNameText: 'Сменить имя',
@@ -48,11 +49,8 @@ export default {
   mounted() {
     // проверка задано ли у пользователя отображаемое имя
     if (firebase.auth().currentUser.displayName) {
-      this.userName = firebase.auth().currentUser.displayName;
-    } else {
-      this.editNameText = 'Определите ваше имя, если требуется. Затем нажмите Сохранить';
-      this.updateName = this.userName;
-      this.editName = true;
+      this.$bindAsObject('user', usersRef.child(firebase.auth().currentUser.displayName));
+      this.userName = this.user.name;
     }
 
     // проверка на наличие аватара у пользователя

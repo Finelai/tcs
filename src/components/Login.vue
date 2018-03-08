@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <h3>Sign In</h3>
+    <h3>Вход</h3>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
     <button v-on:click="signIn">Login</button>
@@ -29,7 +29,7 @@ export default {
           });
         },
         (err) => {
-          this.$toaster.error('Try again.');
+          this.$toaster.error(`Error: ${err.message}`);
         },
       );
     },

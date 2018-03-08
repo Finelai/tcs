@@ -1,6 +1,6 @@
 <template>
   <div class="sign-up">
-    <p>Let's create a new account !</p>
+    <p>Создать новый аккаунт</p>
     <input type="text" v-model="name" placeholder="Name"><br>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import { usersRef } from '../../config/firebase';
 import firebase from 'firebase';
+import { usersRef } from '../../config/firebase';
 
 export default {
   name: 'signUp',
@@ -26,16 +26,27 @@ export default {
     signUp() {
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          usersRef.push({
+          // записываем данные нового юзера в бд и получаем ключ
+          const newUserKey = usersRef.push({
             name: this.name,
             id: user.uid,
             raiting: 0,
+          }).key;
+
+          // обновляем профиль указав ключ в поле displayName
+          firebase.auth().currentUser.updateProfile({
+            displayName: newUserKey,
+          }).then(() => {
+            this.$toaster.success('Вы успешно сменили имя');
+          }).catch((err) => {
+            this.$toaster.error(`Error: ${err.message}`);
           });
-          this.$toaster.success('Welcome, ' + this.name);
+
+          this.$toaster.success(`Добро Пожаловать, ${this.name}`);
           this.$router.replace('user');
         },
         (err) => {
-          this.$toaster.error('Error: ' + err.message);
+          this.$toaster.error(`Error: ${err.message}`);
         },
       );
     },

@@ -40,9 +40,8 @@
 </template>
 
 <script>
-import { usersRef, db } from '../config/firebase';
 import firebase from 'firebase';
-
+import { usersRef, db } from '../config/firebase';
 
 export default {
   data() {
