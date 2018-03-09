@@ -35,7 +35,7 @@ export default {
       updateName: '',
       editName: false,
       editNameText: 'Сменить имя',
-      userAvatar: 'https://api.adorable.io/avatars/face/eyes4/nose4/mouth1/666',
+      userAvatar: '',
       editAvatar: false,
       updateAvatar: '',
     };
@@ -49,15 +49,12 @@ export default {
     // после чего берем this.$route.params.userId и ищем в бд пользователя с таким id, после чего получаем его данные в объекте
   },
   mounted() {
-    // проверка задано ли у пользователя отображаемое имя
+    // получаем id авторизованного пользователя и выводим его имя и аватар из бд
     if (firebase.auth().currentUser.uid) {
       this.$bindAsObject('user', usersRef.child(firebase.auth().currentUser.uid));
+      console.log(this.user);
       this.userName = this.user.name;
-    }
-
-    // проверка на наличие аватара у пользователя
-    if (firebase.auth().currentUser.photoURL) {
-      this.userAvatar = firebase.auth().currentUser.photoURL;
+      this.userAvatar = this.user.avatar;
     }
   },
   methods: {

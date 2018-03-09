@@ -19,8 +19,20 @@ export default {
     return {
       name: '',
       email: '',
-      password: '',
+      password: ''
     };
+  },
+  computed: {
+    randomAvatar() {
+      return Math.floor(Math.random() * (9 - 2 + 1)) + 2;
+    },
+    randomAvatar3() {
+      let randRes = '';
+      for (let x = 0; x < 3; x++) {
+        randRes += Math.floor(Math.random() * (9 - 2 + 1)) + 2;
+      }
+      return randRes;
+    }
   },
   methods: {
     signUp() {
@@ -29,12 +41,13 @@ export default {
           // записываем данные нового юзера в бд
           const newUserData = {
             name: this.name,
-            id: user.uid,
+            email: user.email,
+            avatar: `https://api.adorable.io/avatars/face/eyes${this.randomAvatar}/nose${this.randomAvatar}/mouth1/${this.randomAvatar3}`,
             raiting: 0,
           };
 
           let updates = {};
-          updates[`/users/${newUserData.id}`] = newUserData;
+          updates[`/users/${user.uid}`] = newUserData;
 
           db.ref().update(updates);
 
