@@ -4,6 +4,7 @@ import firebase from 'firebase';
 import Login from '@/components/Login';
 import SignUp from '@/components/SignUp';
 import UserProfile from '@/components/UserProfile';
+import UserList from '@/components/UserList';
 import StreamPage from '@/components/StreamPage';
 import ComponentForm from '@/components/ComponentForm';
 
@@ -42,6 +43,14 @@ const router = new Router({
       path: '/user/:userId',
       name: 'UserProfile',
       component: UserProfile,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/userlist/',
+      name: 'UserList',
+      component: UserList,
       meta: {
         requiresAuth: true,
       },

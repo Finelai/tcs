@@ -8,7 +8,7 @@
     </div>
 
     <div class="edit-name" v-if="editName">
-      <span>{{ editNameText }}</span>
+      <span>Введите новое имя и нажмите Сохранить</span>
       <input type="text" v-model="updateName">
       <button v-on:click="updateUserName">Сохранить</button>
     </div>
@@ -32,9 +32,8 @@ export default {
   data() {
     return {
       userName: '',
-      updateName: '',
       editName: false,
-      editNameText: 'Сменить имя',
+      updateName: '',
       userAvatar: '',
       editAvatar: false,
       updateAvatar: '',
@@ -51,10 +50,15 @@ export default {
   mounted() {
     // получаем id авторизованного пользователя и выводим его имя и аватар из бд
     if (firebase.auth().currentUser.uid) {
-      this.$bindAsObject('user', usersRef.child(firebase.auth().currentUser.uid));
-      console.log(this.user);
-      this.userName = this.user.name;
-      this.userAvatar = this.user.avatar;
+      this.$bindAsObject(
+        'user',
+        usersRef.child(firebase.auth().currentUser.uid),
+        null,
+        function() {
+          this.userName = this.user.name;
+          this.userAvatar = this.user.avatar;
+        },
+      );
     }
   },
   methods: {

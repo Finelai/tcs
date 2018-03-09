@@ -32,7 +32,7 @@ export default {
         randRes += Math.floor(Math.random() * (9 - 2 + 1)) + 2;
       }
       return randRes;
-    }
+    },
   },
   methods: {
     signUp() {
@@ -44,6 +44,7 @@ export default {
             email: user.email,
             avatar: `https://api.adorable.io/avatars/face/eyes${this.randomAvatar}/nose${this.randomAvatar}/mouth1/${this.randomAvatar3}`,
             raiting: 0,
+            streamer: 0,
           };
 
           let updates = {};
