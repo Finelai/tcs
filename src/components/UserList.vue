@@ -11,18 +11,11 @@
 
     <div>
       <p><span @click="onlyStreamers = false">Все пользователи</span> / <span @click="onlyStreamers = true">Стримеры</span></p>
-      <ul v-if="!onlyStreamers">
-        <li v-if="!userName.streamer" v-for="userName of users" v-bind:key="userName['.key']">
-          <p>{{ userName }}</p>
+      <ul>
+        <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of users" v-bind:key="userName['.key']">
+          <p>{{ userName.raiting }} | {{ userName.avatar }} | {{ userName.name }}</p>
           <button @click="removeName(userName['.key'])">Удалить</button>
           <button @click="setStreamer(userName['.key'])">Сделать стримером</button>
-        </li>
-      </ul>
-      <ul v-else>
-        <li v-if="userName.streamer" v-for="userName of users" v-bind:key="userName['.key']">
-          <p>{{ userName }}</p>
-          <button @click="removeName(userName['.key'])">Удалить</button>
-          <button @click="cancelStreamer(userName['.key'])">Убрать из стримеров</button>
         </li>
       </ul>
     </div>
@@ -71,9 +64,6 @@ export default {
     },
     setStreamer(key) {
       usersRef.child(key).update({ streamer: 1 });
-    },
-    cancelStreamer(key) {
-      usersRef.child(key).update({ streamer: 0 });
     },
     saveEdit(person) {
       const key = person['.key'];

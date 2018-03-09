@@ -1,11 +1,9 @@
 <template>
   <div class="user-profile">
+
     <h1>{{ userName }}</h1>
+
     <img width="100" v-bind:src="userAvatar">
-    <div>
-      <button v-on:click="editName=!editName">Сменить имя</button>
-      <button v-on:click="editAvatar=!editAvatar">Сменить аватар</button>
-    </div>
 
     <div class="edit-name" v-if="editName">
       <span>Введите новое имя и нажмите Сохранить</span>
@@ -19,7 +17,12 @@
       <button v-on:click="updateUserAvatar">Сохранить</button>
     </div>
 
-    <button v-on:click="logout">Выйти</button>
+    <div v-if="owner">
+      <button v-on:click="editName=!editName">Сменить имя</button>
+      <button v-on:click="editAvatar=!editAvatar">Сменить аватар</button>
+      <button v-on:click="logout">Выйти</button>
+    </div>
+
   </div>
 </template>
 
@@ -37,28 +40,31 @@ export default {
       userAvatar: '',
       editAvatar: false,
       updateAvatar: '',
+      owner: false,
     };
   },
   created() {
     // отображение ссылки пользователя
-    if (firebase.auth().currentUser && !this.$route.params.userId) {
-      this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
-    }
+    // if (firebase.auth().currentUser && !this.$route.params.userId) {
+    //   this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
+    // }
     // а если в базе данных у этого пользователя создана запись link, то пушем не id пользователя а link
     // после чего берем this.$route.params.userId и ищем в бд пользователя с таким id, после чего получаем его данные в объекте
   },
   mounted() {
-    // получаем id авторизованного пользователя и выводим его имя и аватар из бд
-    if (firebase.auth().currentUser.uid) {
+    if (firebase.auth().currentUser.uid && this.$route.params.userId) {
       this.$bindAsObject(
         'user',
-        usersRef.child(firebase.auth().currentUser.uid),
+        usersRef.child(this.$route.params.userId),
         null,
         function() {
           this.userName = this.user.name;
           this.userAvatar = this.user.avatar;
         },
       );
+      if (firebase.auth().currentUser.uid === this.$route.params.userId) {
+        this.owner = true;
+      }
     }
   },
   methods: {
@@ -68,26 +74,18 @@ export default {
       });
     },
     updateUserName() {
-      firebase.auth().currentUser.updateProfile({
-        displayName: this.updateName,
-      }).then((user) => {
-        this.userName = firebase.auth().currentUser.displayName;
-        this.editName = false;
-        this.$toaster.success('Вы успешно сменили имя');
-      }).catch((err) => {
-        this.$toaster.error('Try again.');
-      });
+      usersRef.child(firebase.auth().currentUser.uid).update({ name: this.updateName });
+      this.userName = this.updateName;
+      this.editName = false;
+      this.$toaster.success('Вы успешно сменили имя');
+      this.updateName = '';
     },
     updateUserAvatar() {
-      firebase.auth().currentUser.updateProfile({
-        photoURL: this.updateAvatar,
-      }).then((user) => {
-        this.userAvatar = firebase.auth().currentUser.photoURL;
-        this.editAvatar = false;
-        this.$toaster.success('Ваш аватар успешно заменен');
-      }).catch((err) => {
-        this.$toaster.error('Try again.');
-      });
+      usersRef.child(firebase.auth().currentUser.uid).update({ avatar: this.updateAvatar });
+      this.userAvatar = this.updateAvatar;
+      this.editAvatar = false;
+      this.$toaster.success('Ваш аватар успешно заменен');
+      this.updateAvatar = '';
     },
   },
 };
