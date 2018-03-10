@@ -3,6 +3,8 @@
 
     <h1>{{ userName }}</h1>
 
+    <p><router-link v-if="streamer" :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Перейти на стрим</router-link></p>
+
     <img width="100" v-bind:src="userAvatar">
 
     <div class="edit-name" v-if="editName">
