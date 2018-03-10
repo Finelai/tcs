@@ -49,7 +49,7 @@ const router = new Router({
       },
     },
     {
-      path: '/stream/:streamTitle',
+      path: '/stream/:streamLink',
       name: 'StreamPage',
       component: StreamPage,
       meta: {

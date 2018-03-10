@@ -6,7 +6,7 @@
     <div>
       <ul>
         <li v-for="stream of streams" v-bind:key="stream['.key']">
-          <p>{{ stream.raiting }} | <router-link :to="{ name: 'StreamPage', params: { streamTitle: stream['.key'] } }">{{ stream.settings.title }}</router-link></p>
+          <p>{{ stream.raiting }} | <router-link :to="{ name: 'StreamPage', params: { streamLink: stream['.key'] } }">{{ stream.settings.title }}</router-link></p>
           <button @click="removeName(stream['.key'])">Удалить стрим</button>
         </li>
       </ul>
@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     removeName(key) {
-      streams.child(key).remove();
+      streamsRef.child(key).remove();
     },
   },
 };

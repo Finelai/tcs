@@ -42,4 +42,5 @@ const app = initializeApp({
 
 export const db = app.database();
 export const usersRef = db.ref('users');
+export const streamsRef = db.ref('streams');
 ```
