@@ -146,7 +146,8 @@ export default {
             usersRef.child(firebase.auth().currentUser.uid).update({ streamer: this.streamLink });
 
             const newStreamData = {
-              streamer: firebase.auth().currentUser.uid,
+              streamerid: firebase.auth().currentUser.uid,
+              streamername: this.userName,
               settings: {
                 title: this.streamTitle,
                 roundtime: 60,
