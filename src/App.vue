@@ -4,6 +4,7 @@
     <header>
       <div class="header-wrapper">
         <nav>
+          <router-link :to="{ name: 'StreamList' }">Список стримов</router-link>
           <router-link :to="{ name: 'StreamPage' }">Stream Page</router-link>
           <router-link :to="{ name: 'SignUp' }">Регистрация</router-link>
           <router-link :to="{ name: 'Login' }">Вход</router-link>

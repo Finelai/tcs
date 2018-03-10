@@ -6,6 +6,7 @@ import SignUp from '@/components/SignUp';
 import UserProfile from '@/components/UserProfile';
 import UserList from '@/components/UserList';
 import StreamPage from '@/components/StreamPage';
+import StreamList from '@/components/StreamList';
 import ComponentForm from '@/components/ComponentForm';
 
 Vue.use(Router);
@@ -20,14 +21,6 @@ const router = new Router({
     {
       path: '/',
       redirect: '/login',
-    },
-    {
-      path: '/stream',
-      name: 'StreamPage',
-      component: StreamPage,
-      meta: {
-        requiresAuth: true,
-      },
     },
     {
       path: '/login',
@@ -48,9 +41,25 @@ const router = new Router({
       },
     },
     {
-      path: '/userlist/',
+      path: '/userlist',
       name: 'UserList',
       component: UserList,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/stream/:streamTitle',
+      name: 'StreamPage',
+      component: StreamPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/streamlist',
+      name: 'StreamList',
+      component: StreamList,
       meta: {
         requiresAuth: true,
       },

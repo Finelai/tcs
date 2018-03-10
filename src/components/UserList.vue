@@ -13,7 +13,7 @@
       <p><span @click="onlyStreamers = false">Все пользователи</span> / <span @click="onlyStreamers = true">Стримеры</span></p>
       <ul>
         <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of users" v-bind:key="userName['.key']">
-          <p>{{ userName.raiting }} | {{ userName.avatar }} | <router-link :to="{ name: 'UserProfile', params: { userId: userName['.key'] } }">{{ userName.name }}</router-link></p>
+          <p>{{ userName.raiting }} | <img width="100" height="100" v-bind:src="userName.avatar"> | <router-link :to="{ name: 'UserProfile', params: { userId: userName['.key'] } }">{{ userName.name }}</router-link></p>
           <button @click="removeName(userName['.key'])">Удалить</button>
           <button @click="setStreamer(userName['.key'])">Сделать стримером</button>
         </li>
