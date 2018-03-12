@@ -4,7 +4,6 @@
 - webpack
 - vue
 - vuex
-- jsonp
 - firebase
 
 ### structure:

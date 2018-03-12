@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 import Vue from 'vue';
-import vueJsonp from 'vue-jsonp';
 
 import '../config/firebase';
 import firebase from 'firebase';
@@ -24,7 +23,6 @@ firebase.auth().onAuthStateChanged(function(user) {
     app = new Vue({
       el: '#app',
       router,
-      vueJsonp,
       components: { App },
       template: '<App/>',
     });

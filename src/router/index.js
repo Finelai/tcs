@@ -7,7 +7,6 @@ import UserProfile from '@/components/UserProfile';
 import UserList from '@/components/UserList';
 import StreamPage from '@/components/StreamPage';
 import StreamList from '@/components/StreamList';
-import ComponentForm from '@/components/ComponentForm';
 
 Vue.use(Router);
 
@@ -60,14 +59,6 @@ const router = new Router({
       path: '/streamlist',
       name: 'StreamList',
       component: StreamList,
-      meta: {
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/form',
-      name: 'ComponentForm',
-      component: ComponentForm,
       meta: {
         requiresAuth: true,
       },

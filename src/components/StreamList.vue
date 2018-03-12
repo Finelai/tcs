@@ -17,7 +17,7 @@
 
 <script>
 import firebase from 'firebase';
-import { streamsRef, db } from '../../config/firebase';
+import { streamsRef } from '../../config/firebase';
 
 export default {
   data() {
