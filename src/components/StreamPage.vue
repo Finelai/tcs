@@ -8,6 +8,22 @@
     <input type="text" id="streamLink" v-model="streamLink">
     <span @click="copyStreamLink">Копировать ссылку на стрим</span>
 
+    <p>Осталось до конца раунда: <span>{{ curRoundTime }}</span></p>
+
+    <div class="comments">
+      <ul style="list-style-type: none;">
+        <li v-for="comment in stream.temp.comments" v-bind:key="comment['.key']">
+          <img width="50" height="50" v-bind:src="comment.useravatar">
+          <span>{{ comment.username }}</span>
+          <p>
+            {{ comment.comment }}
+            <br>
+            Raiting: {{ comment.raiting }}
+          </p>
+        </li>
+      </ul>
+    </div>
+
     <div class="streamer-settings" v-if="owner">
       <button @click="startStream">Начать стрим</button>
       <button @click="endStream">Завершить стрим</button>
@@ -41,8 +57,8 @@
       <span>{{ userName }}</span>
       <img width="100" height="100" v-bind:src="userAvatar">
       <br>
-      <textarea name="" id="" cols="30" rows="4"></textarea>
-      <button>Отправить</button>
+      <textarea cols="30" rows="4" v-model='userComment'></textarea>
+      <button @click="sendUserComment">Отправить</button>
     </div>
 
   </div>
@@ -58,8 +74,10 @@ export default {
     return {
       streamTitle: '',
       streamLink: window.location.href,
+      userId: '',
       userName: '',
       userAvatar: '',
+      userComment: '',
 
       owner: false,
 
@@ -77,8 +95,11 @@ export default {
       timer: '',
     };
   },
+  created() {
+    this.userId = firebase.auth().currentUser.uid;
+  },
   mounted() {
-    if (firebase.auth().currentUser.uid && this.$route.params.streamLink) {
+    if (this.userId && this.$route.params.streamLink) {
       this.$bindAsObject(
         'stream',
         streamsRef.child(this.$route.params.streamLink),
@@ -94,18 +115,18 @@ export default {
             this.newStreamDesc = this.stream.settings.description;
           }
           // проверяем является ли текущий пользователем владельцем стрима
-          if (firebase.auth().currentUser.uid === this.stream.streamerid) {
+          if (this.userId === this.stream.streamerid) {
             this.owner = true;
           } else {
             // получаем данные о текущем пользователе
             this.$bindAsObject(
               'user',
-              usersRef.child(firebase.auth().currentUser.uid),
+              usersRef.child(this.userId),
               null,
               function () {
                 this.userName = this.user.name;
                 this.userAvatar = this.user.avatar;
-              }
+              },
             );
           }
         },
@@ -113,7 +134,28 @@ export default {
     }
   },
   methods: {
+    sendUserComment() {
+      // проверяем существует ли в temp / comments запись по текущему uid
+      if (this.stream.temp.comments[this.userId] === undefined) {
+        // если записи нет, то в temp добавляем userid { comment : Текст комментария, raiting: 0 }
+        const newTempComment = {
+          username: this.userName,
+          useravatar: this.userAvatar,
+          comment: this.userComment,
+          raiting: 0,
+        };
+        let updates = {};
+        updates[`/temp/comments/${this.userId}`] = newTempComment;
+        streamsRef.child(this.$route.params.streamLink).update(updates);
+
+        this.$toaster.success('Комментарий успешно опубликован');
+        this.userComment = '';
+      } else {
+        this.$toaster.error('Вы уже оставляли комментарий в этом раунде');
+      }
+    },
     startStream() {
+      // если таймер 0, то весь стрим считается одним раундом
       if (this.curRoundTime !== 0) {
         const roundTimeMs = this.curRoundTime * 1000;
         this.timer = setInterval(() => {
@@ -123,6 +165,8 @@ export default {
       }
     },
     endStream() {
+      // добавить проверку на существование интервала
+      // если интервал не создан, то проделать все операции по сбору комментариев
       clearInterval(this.timer);
     },
     updateStreamTitle() {

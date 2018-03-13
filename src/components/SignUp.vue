@@ -19,7 +19,7 @@ export default {
     return {
       name: '',
       email: '',
-      password: ''
+      password: '',
     };
   },
   computed: {

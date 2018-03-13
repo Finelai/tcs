@@ -153,6 +153,10 @@ export default {
                 roundtime: 60,
               },
               raiting: 0,
+              temp: {
+                comments: 0,
+                liked: 0,
+              },
             };
 
             let updates = {};
