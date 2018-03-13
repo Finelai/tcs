@@ -153,6 +153,12 @@ export default {
                 roundtime: 60,
               },
               raiting: 0,
+              topcomments: 0,
+              topusers: 0,
+              currentstream: {
+                topcomments: 0,
+                topusers: 0,
+              },
               temp: {
                 comments: 0,
                 liked: 0,
