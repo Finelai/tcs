@@ -4,6 +4,8 @@
 - webpack
 - vue
 - vuex
+- vue2-filters
+- v-toaster
 - firebase
 
 ### structure:
