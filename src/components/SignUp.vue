@@ -24,12 +24,16 @@ export default {
   },
   computed: {
     randomAvatar() {
-      return Math.floor(Math.random() * (9 - 2 + 1)) + 2;
+      const min = 2;
+      const max = 9;
+      return Math.floor(Math.random() * ((max - min) + 1)) + min;
     },
     randomAvatar3() {
+      const min = 2;
+      const max = 9;
       let randRes = '';
-      for (let x = 0; x < 3; x++) {
-        randRes += Math.floor(Math.random() * (9 - 2 + 1)) + 2;
+      for (let x = 0; x < 3; x += 1) {
+        randRes += Math.floor(Math.random() * ((max - min) + 1)) + min;
       }
       return randRes;
     },

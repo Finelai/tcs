@@ -12,7 +12,7 @@
 
     <div class="comments">
       <ul style="list-style-type: none;">
-        <li v-for="(comment, key) in stream.temp.comments" v-bind:key="key">
+        <li v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid">
           <img width="50" height="50" v-bind:src="comment.useravatar">
           <span>{{ comment.username }}</span>
           <p>
@@ -20,9 +20,9 @@
             <br>
             Raiting: {{ comment.raiting }}
           </p>
-          <div v-if="key !== userId">
-            <button @click="commentLike(key)">Like</button>
-            <button @click="commentDislike(key)">Dislike</button>
+          <div v-if="comment.userid !== userId">
+            <button @click="commentLike(comment.userid)">Like</button>
+            <button @click="commentDislike(comment.userid)">Dislike</button>
           </div>
         </li>
       </ul>
@@ -99,42 +99,59 @@ export default {
       timer: '',
     };
   },
+  computed: {
+    comments() {
+      let newCommentsArr = [];
+      if (this.stream.temp.comments) {
+        for (let x = 0; x < Object.keys(this.stream.temp.comments).length; x += 1) {
+          let newObj = this.stream.temp.comments[Object.keys(this.stream.temp.comments)[x]];
+          newObj.userid = Object.keys(this.stream.temp.comments)[x];
+          newCommentsArr.push(newObj);
+        }
+      }
+      console.log(newCommentsArr);
+      return newCommentsArr;
+    },
+  },
   created() {
     this.userId = firebase.auth().currentUser.uid;
-  },
-  mounted() {
     if (this.userId && this.$route.params.streamLink) {
-      this.$bindAsObject(
-        'stream',
-        streamsRef.child(this.$route.params.streamLink),
-        null,
-        function () {
-          // после получения данных о стриме
-          this.streamTitle = this.stream.settings.title;
-          this.newStreamTitle = this.stream.settings.title;
-          this.curRoundTime = this.stream.settings.roundtime;
-          this.newRoundTime = this.stream.settings.roundtime;
-          if (this.stream.settings.description) {
-            this.streamDesc = this.stream.settings.description;
-            this.newStreamDesc = this.stream.settings.description;
-          }
-          // проверяем является ли текущий пользователем владельцем стрима
-          if (this.userId === this.stream.streamerid) {
-            this.owner = true;
-          } else {
-            // получаем данные о текущем пользователе
-            this.$bindAsObject(
-              'user',
-              usersRef.child(this.userId),
-              null,
-              function () {
-                this.userName = this.user.name;
-                this.userAvatar = this.user.avatar;
-              },
-            );
-          }
-        },
-      );
+      this.$watch('stream', () => {
+        this.$bindAsObject(
+          'stream',
+          streamsRef.child(this.$route.params.streamLink),
+          null,
+          () => {
+            // после получения данных о стриме
+            this.streamTitle = this.stream.settings.title;
+            this.newStreamTitle = this.stream.settings.title;
+            this.curRoundTime = this.stream.settings.roundtime;
+            this.newRoundTime = this.stream.settings.roundtime;
+            if (this.stream.settings.description) {
+              this.streamDesc = this.stream.settings.description;
+              this.newStreamDesc = this.stream.settings.description;
+            }
+            // проверяем является ли текущий пользователем владельцем стрима
+            if (this.userId === this.stream.streamerid) {
+              this.owner = true;
+            } else {
+              // получаем данные о текущем пользователе
+              this.$bindAsObject(
+                'user',
+                usersRef.child(this.userId),
+                null,
+                () => {
+                  this.userName = this.user.name;
+                  this.userAvatar = this.user.avatar;
+                },
+              );
+            }
+          },
+        );
+      }, {
+        immediate: true,
+        deep: true,
+      });
     }
   },
   methods: {
@@ -161,7 +178,6 @@ export default {
     commentLike(commentId) {
       // toDo: упростить условие
       if (this.stream.temp.liked[this.userId]) {
-
         if (!this.stream.temp.liked[this.userId].like) {
           // прибавляем к рейтингу комментария единицу
           const newRaiting = this.stream.temp.comments[commentId].raiting + 1;
@@ -172,20 +188,18 @@ export default {
         } else {
           this.$toaster.error('Вы уже отдали свой лайк в этом раунде');
         }
-
       } else {
         // прибавляем к рейтингу комментария единицу
         const newRaiting = this.stream.temp.comments[commentId].raiting + 1;
         streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
         // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
-        streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({like: commentId });
+        streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ like: commentId });
         this.$toaster.info('Вы использовали свой лайк в этом раунде');
       }
     },
     commentDislike(commentId) {
       // toDo: упростить условие
       if (this.stream.temp.liked[this.userId]) {
-
         if (!this.stream.temp.liked[this.userId].dislike) {
           // снижаем рейтинг комментария на единицу
           const newRaiting = this.stream.temp.comments[commentId].raiting - 1;
@@ -196,7 +210,6 @@ export default {
         } else {
           this.$toaster.error('Вы уже отдали свой дислайк в этом раунде');
         }
-
       } else {
         // снижаем рейтинг комментария на единицу
         const newRaiting = this.stream.temp.comments[commentId].raiting - 1;

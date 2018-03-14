@@ -80,7 +80,7 @@ export default {
         'user',
         usersRef.child(this.$route.params.userId),
         null,
-        function () {
+        () => {
           this.userName = this.user.name;
           this.userAvatar = this.user.avatar;
           this.streamer = this.user.streamer || false;
@@ -136,10 +136,10 @@ export default {
       this.$bindAsObject(
         'stream',
         streamsRef.child(this.streamLink),
-        function () {
+        () => {
           this.$toaster.error('Потеряно соединение с базой данных. Попробуйте ещё раз!');
         },
-        function () {
+        () => {
           if (this.stream.streamer) {
             this.$toaster.error(`Стрим c таким именем (${this.streamLink}) уже существует`);
           } else {

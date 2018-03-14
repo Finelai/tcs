@@ -12,7 +12,7 @@
     <div>
       <p><span @click="onlyStreamers = false">Все пользователи</span> / <span @click="onlyStreamers = true">Стримеры</span></p>
       <ul>
-        <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of users" v-bind:key="userName['.key']">
+        <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of orderBy(users, 'raiting', -1)" v-bind:key="userName['.key']">
           <p>
             {{ userName.raiting }} |
             <img width="100" height="100" v-bind:src="userName.avatar"> |
