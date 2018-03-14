@@ -21,8 +21,14 @@
             Raiting: {{ comment.raiting }}
           </p>
           <div v-if="comment.userid !== userId">
-            <button @click="commentLike(comment.userid)">Like</button>
-            <button @click="commentDislike(comment.userid)">Dislike</button>
+            <div v-if="stream.temp.liked[userId] !== undefined">
+              <button v-if="stream.temp.liked[userId].like === undefined" @click="commentLike(comment.userid)">Like</button>
+              <button v-if="stream.temp.liked[userId].dislike === undefined" @click="commentDislike(comment.userid)">Dislike</button>
+            </div>
+            <div v-else>
+              <button @click="commentLike(comment.userid)">Like</button>
+              <button @click="commentDislike(comment.userid)">Dislike</button>
+            </div>
           </div>
         </li>
       </ul>
@@ -176,48 +182,20 @@ export default {
       }
     },
     commentLike(commentId) {
-      // toDo: упростить условие
-      if (this.stream.temp.liked[this.userId]) {
-        if (!this.stream.temp.liked[this.userId].like) {
-          // прибавляем к рейтингу комментария единицу
-          const newRaiting = this.stream.temp.comments[commentId].raiting + 1;
-          streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
-          // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
-          streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ like: commentId });
-          this.$toaster.info('Вы использовали свой лайк в этом раунде');
-        } else {
-          this.$toaster.error('Вы уже отдали свой лайк в этом раунде');
-        }
-      } else {
-        // прибавляем к рейтингу комментария единицу
-        const newRaiting = this.stream.temp.comments[commentId].raiting + 1;
-        streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
-        // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
-        streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ like: commentId });
-        this.$toaster.info('Вы использовали свой лайк в этом раунде');
-      }
+      // прибавляем к рейтингу комментария единицу
+      const newRaiting = this.stream.temp.comments[commentId].raiting + 1;
+      streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
+      // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
+      streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ like: commentId });
+      this.$toaster.info('Вы использовали свой лайк в этом раунде');
     },
     commentDislike(commentId) {
-      // toDo: упростить условие
-      if (this.stream.temp.liked[this.userId]) {
-        if (!this.stream.temp.liked[this.userId].dislike) {
-          // снижаем рейтинг комментария на единицу
-          const newRaiting = this.stream.temp.comments[commentId].raiting - 1;
-          streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
-          // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
-          streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ dislike: commentId });
-          this.$toaster.info('Вы использовали свой дислайк в этом раунде');
-        } else {
-          this.$toaster.error('Вы уже отдали свой дислайк в этом раунде');
-        }
-      } else {
-        // снижаем рейтинг комментария на единицу
-        const newRaiting = this.stream.temp.comments[commentId].raiting - 1;
-        streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
-        // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
-        streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ dislike: commentId });
-        this.$toaster.info('Вы использовали свой дислайк в этом раунде');
-      }
+      // снижаем рейтинг комментария на единицу
+      const newRaiting = this.stream.temp.comments[commentId].raiting - 1;
+      streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
+      // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
+      streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ dislike: commentId });
+      this.$toaster.info('Вы использовали свой дислайк в этом раунде');
     },
     startStream() {
       // если таймер 0, то весь стрим считается одним раундом
