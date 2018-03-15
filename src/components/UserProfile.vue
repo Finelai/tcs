@@ -1,7 +1,7 @@
 <template>
   <div class="user-profile">
 
-    <h1>{{ userName }}</h1>
+    <h1><em>{{ userRaiting }}</em> {{ userName }}</h1>
 
     <p><router-link v-if="streamer" :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Перейти на стрим</router-link></p>
 
@@ -55,9 +55,13 @@ export default {
       userName: '',
       editName: false,
       updateName: '',
+
       userAvatar: '',
       editAvatar: false,
       updateAvatar: '',
+
+      userRaiting: 0,
+
       owner: false,
       streamer: false,
       streamCreate: false,
@@ -83,6 +87,7 @@ export default {
         () => {
           this.userName = this.user.name;
           this.userAvatar = this.user.avatar;
+          this.userRaiting = this.user.raiting;
           this.streamer = this.user.streamer || false;
         },
       );
@@ -148,6 +153,7 @@ export default {
             const newStreamData = {
               streamerid: firebase.auth().currentUser.uid,
               streamername: this.userName,
+              streameravatar: this.userAvatar,
               settings: {
                 title: this.streamTitle,
                 roundtime: 60,
@@ -155,11 +161,12 @@ export default {
               raiting: 0,
               topcomments: 0,
               topusers: 0,
-              currentstream: {
+              current: {
                 topcomments: 0,
                 topusers: 0,
               },
               temp: {
+                roundend: 0,
                 comments: 0,
                 liked: 0,
               },

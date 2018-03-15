@@ -49,6 +49,7 @@ export default {
             avatar: `https://api.adorable.io/avatars/face/eyes${this.randomAvatar}/nose${this.randomAvatar}/mouth1/${this.randomAvatar3}`,
             raiting: 0,
             streamer: 0,
+            comments: 0,
           };
 
           let updates = {};

@@ -87,6 +87,7 @@ export default {
       userId: '',
       userName: '',
       userAvatar: '',
+      userRaiting: '',
       userComment: '',
 
       owner: false,
@@ -130,7 +131,6 @@ export default {
             if (curSec < this.stream.temp.roundend) {
               const diff = Math.floor((this.stream.temp.roundend - curSec) / 1000);
               this.cdRoundTime = diff;
-              console.log(diff);
               return diff;
             } else {
               clearInterval(this.roundTimer);
@@ -170,6 +170,7 @@ export default {
                 () => {
                   this.userName = this.user.name;
                   this.userAvatar = this.user.avatar;
+                  this.userRaiting = this.user.raiting;
                 },
               );
             }
@@ -189,6 +190,7 @@ export default {
         const newTempComment = {
           username: this.userName,
           useravatar: this.userAvatar,
+          userraiting: this.userRaiting,
           comment: this.userComment,
           raiting: 0,
         };
@@ -221,20 +223,67 @@ export default {
     startStream() {
       // если таймер 0, то весь стрим считается одним раундом
       if (this.curRoundTime !== 0) {
-        console.log('stream started');
+        this.$toaster.success('Стрим запущен');
         const roundTimeMs = this.curRoundTime * 1000;
         this.timer = setInterval(() => {
           const roundEndMs = new Date().getTime() + roundTimeMs;
-          console.log(roundEndMs);
           streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: roundEndMs });
-          console.log(new Date().getTime());
+          this.$toaster.info(`Раунд завершен!`);
         }, roundTimeMs);
       }
     },
     endStream() {
-      // добавить проверку на существование интервала
-      // если интервал не создан, то проделать все операции по сбору комментариев
       clearInterval(this.timer);
+
+      // 1. Проверяем есть ли комментарии в this.temp.comments
+      if (this.comments.length > 0) {
+        // 2. Берем данные комментария и записываем их (push) в this.stream.current.topcomments и в this.stream.topcomments
+        this.comments.forEach((item) => {
+          if (item.raiting > 0) {
+            const curComment = {
+              raiting: item.raiting,
+              comment: item.comment,
+              username: item.username,
+              useravatar: item.useravatar,
+              userraiting: item.userraiting, /* outdated */
+              userid: item.userid,
+            };
+            streamsRef.child(this.$route.params.streamLink).child(`current/topcomments`).push(curComment);
+            streamsRef.child(this.$route.params.streamLink).child(`topcomments/${item.userid}`).push(curComment);
+            // 3. Берем данные комментатора и записываем (update) в this.stream.current.topusers и в this.stream.topusers
+            // 3.1 Если пользователь уже есть в this.stream.current.topusers или в this.stream.topusers, то увеличиваем его рейтинг на величину рейтинга комментария
+            const curUser = {
+              raiting: item.raiting,
+              name: item.username,
+              avatar: item.useravatar,
+              userraiting: item.userraiting, /* outdated */
+            };
+
+            if (this.stream.current.topusers[item.userid] === undefined) {
+              streamsRef.child(this.$route.params.streamLink).child(`current/topusers/${item.userid}`).update(curUser);
+            } else {
+              streamsRef.child(this.$route.params.streamLink).child(`current/topusers/${item.userid}`).update({ raiting: this.stream.current.topusers[item.userid].raiting + item.raiting });
+            }
+
+            if (this.stream.topusers[item.userid] === undefined) {
+              streamsRef.child(this.$route.params.streamLink).child(`topusers/${item.userid}`).update(curUser);
+              usersRef.child(item.userid).child(`comments/${this.$route.params.streamLink}`).update({ raiting: item.raiting });
+            } else {
+              const newStreamRaiting = this.stream.topusers[item.userid].raiting + item.raiting;
+              streamsRef.child(this.$route.params.streamLink).child(`topusers/${item.userid}`).update({ raiting: newStreamRaiting });
+              usersRef.child(item.userid).child(`comments/${this.$route.params.streamLink}`).update({ raiting: newStreamRaiting });
+            }
+            // 3.2 Прибавляем рейтинг записанный в this.stream.topusers к общему рейтингу пользователя
+            // 3.3 Добавляем рейтинг в суммарный рейтинг по стриму в usersRef.child(item.userid).child('comments').push()
+            usersRef.child(item.userid).update({ raiting: item.userraiting + item.raiting });
+          }
+        });
+        // 4. Очищаем this.stream.temp.comments и this.stream.temp.liked
+        streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ comments: 0, liked: 0 });
+      }
+      // 5. this.stream.temp.roundend = 0
+      streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: 0 });
+      this.$toaster.success('Вы успешно завершили стрим');
     },
     updateStreamTitle() {
       streamsRef.child(this.$route.params.streamLink).child('settings').update({ title: this.newStreamTitle });
