@@ -8,7 +8,7 @@
     <input type="text" id="streamLink" v-model="streamLink">
     <span @click="copyStreamLink">Копировать ссылку на стрим</span>
 
-    <p>Осталось до конца раунда: <span>{{ curRoundTime }}</span></p>
+    <p>Осталось до конца раунда: <span>{{ cdRoundTime }}</span> {{ roundend }}</p>
 
     <div class="comments">
       <ul style="list-style-type: none;">
@@ -103,6 +103,8 @@ export default {
       newStreamDesc: '',
 
       timer: '',
+      roundTimer: '',
+      cdRoundTime: 0,
     };
   },
   computed: {
@@ -117,6 +119,25 @@ export default {
       }
       console.log(newCommentsArr);
       return newCommentsArr;
+    },
+    // создать функцию, которая возвращает оставщееся время до конца раунда
+    roundend() {
+      if (this.stream.temp.roundend) {
+        console.log(this.stream.temp.roundend);
+        this.roundTimer = setInterval(() => {
+            const curSec = new Date().getTime();
+            console.log(curSec);
+            if (curSec < this.stream.temp.roundend) {
+              const diff = Math.floor((this.stream.temp.roundend - curSec) / 1000);
+              this.cdRoundTime = diff;
+              console.log(diff);
+              return diff;
+            } else {
+              clearInterval(this.roundTimer);
+              return 'x';
+            }
+        }, 1000);
+      }
     },
   },
   created() {
@@ -200,10 +221,13 @@ export default {
     startStream() {
       // если таймер 0, то весь стрим считается одним раундом
       if (this.curRoundTime !== 0) {
+        console.log('stream started');
         const roundTimeMs = this.curRoundTime * 1000;
         this.timer = setInterval(() => {
+          const roundEndMs = new Date().getTime() + roundTimeMs;
+          console.log(roundEndMs);
+          streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: roundEndMs });
           console.log(new Date().getTime());
-          console.log('tack');
         }, roundTimeMs);
       }
     },
@@ -250,6 +274,9 @@ export default {
       // Снятие выделения
       window.getSelection().removeAllRanges();
     },
+  },
+  destroyed() {
+    clearInterval(this.roundTimer);
   },
 };
 </script>
