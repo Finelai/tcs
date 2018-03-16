@@ -71,6 +71,34 @@
       <button @click="sendUserComment">Отправить</button>
     </div>
 
+    <div class="current">
+      <div class="current-topcomments">
+        <h3>Лучшие комментарии текущего стрима</h3>
+        <ul>
+          <li v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']">
+            <img width="20" height="20" v-bind:src="comment.useravatar">
+            <span>{{ comment.username }}</span>
+            <p>
+              {{ comment.comment }}
+              <br>
+              Raiting: {{ comment.raiting }}
+            </p>
+          </li>
+        </ul>
+      </div>
+      <div class="current-topusers">
+        <h3>Лучшие пользователи текущего стрима</h3>
+        <ul>
+          <li v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']">
+            <img width="30" height="30" v-bind:src="user.avatar">
+            <p>
+              <strong>{{ user.raiting }}</strong> | {{ user.name }}
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -110,17 +138,27 @@ export default {
       cdRoundTime: 0,
     };
   },
+  firebase: function() {
+    return {
+      streamCurrentComments: streamsRef.child(`${this.$route.params.streamLink}/current/topcomments`),
+      streamCurrentUsers: streamsRef.child(`${this.$route.params.streamLink}/current/topusers`),
+    }
+  },
   computed: {
     comments() {
       let newCommentsArr = [];
       if (this.stream.temp.comments) {
-        for (let x = 0; x < Object.keys(this.stream.temp.comments).length; x += 1) {
-          let newObj = this.stream.temp.comments[Object.keys(this.stream.temp.comments)[x]];
-          newObj.userid = Object.keys(this.stream.temp.comments)[x];
+        // for (let x = 0; x < Object.keys(this.stream.temp.comments).length; x += 1) {
+        //   let newObj = this.stream.temp.comments[Object.keys(this.stream.temp.comments)[x]];
+        //   newObj.userid = Object.keys(this.stream.temp.comments)[x];
+        //   newCommentsArr.push(newObj);
+        // }
+        for (let key in this.stream.temp.comments) {
+          let newObj = this.stream.temp.comments[key];
+          newObj.userid = key;
           newCommentsArr.push(newObj);
         }
       }
-      console.log(newCommentsArr);
       return newCommentsArr;
     },
     // создать функцию, которая возвращает оставщееся время до конца раунда
