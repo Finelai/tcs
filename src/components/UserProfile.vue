@@ -41,6 +41,20 @@
       <button v-on:click="createNewStream">Создать</button>
     </div>
 
+    <div v-if="Object.keys(comments).length === 0 ">
+      <p>У этого пользователя нет ни одного комментария с положительным рейтингом</p>
+    </div>
+    <div v-else class="comments">
+      <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink">
+        <p>{{ streamComments.userRaitingByStream }} <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link></p>
+        <ul>
+          <li v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
+            <p><strong>{{ oneComment.raiting }}</strong> {{ oneComment.comment }}</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -68,6 +82,8 @@ export default {
       streamTitle: '',
       streamLink: '',
       profileLink: '',
+
+      comments: [],
     };
   },
   created() {
@@ -75,10 +91,11 @@ export default {
     if (firebase.auth().currentUser && !this.$route.params.userId) {
       this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
     }
+
+    // TODO: Создание ссылки на страницу пользователя заданного вида
     // а если в базе данных у этого пользователя создана запись link, то пушем не id пользователя а link
     // после чего берем this.$route.params.userId и ищем в бд пользователя с таким id, после чего получаем его данные в объекте
-  },
-  mounted() {
+
     if (firebase.auth().currentUser.uid && this.$route.params.userId) {
       this.$bindAsObject(
         'user',
@@ -89,6 +106,41 @@ export default {
           this.userAvatar = this.user.avatar;
           this.userRaiting = this.user.raiting;
           this.streamer = this.user.streamer || false;
+
+          // 1. Проверяем есть ли в user.comments записи
+          if (this.user.comments !== 0) {
+            // 2. Проходим циклом по записям, берем user.comments[key] и получаем данные из streams
+            for (let key in this.user.comments) {
+              console.log(key, this.user.comments[key].raiting);
+              this.$bindAsArray(
+                key,
+                streamsRef.child(key).child(`topcomments`).child(this.$route.params.userId),
+                null,
+                () => {
+                  // 3. Записываем полученные комментарии в массив, а массив в общий объект
+                  // this.comments = Object.assign({}, this.comments, {
+                  //   [key]: {
+                  //     userRaitingByStream: this.user.comments[key].raiting,
+                  //     streamTitle: '',
+                  //     userComments: this[key],
+                  //   },
+                  // });
+
+                  // получаем stream title из бд отдельным запросом
+                  // db.ref(`/streams/${key}/settings`).once('value').then((snapshot) => { this.comments[key].streamTitle = snapshot.val().title; });
+                  db.ref(`/streams/${key}/settings`).once('value').then((snapshot) => {
+                    // реализуем через добавление в массив для сортировки
+                    this.comments.push({
+                      streamLink: key,
+                      userRaitingByStream: this.user.comments[key].raiting,
+                      streamTitle: snapshot.val().title,
+                      userComments: this[key],
+                    });
+                  });
+                },
+              );
+            }
+          }
         },
       );
       if (firebase.auth().currentUser.uid === this.$route.params.userId) {

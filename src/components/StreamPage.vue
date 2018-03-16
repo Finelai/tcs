@@ -1,7 +1,7 @@
 <template>
   <div class="stream-page">
 
-    <h1>{{ streamTitle }}</h1>
+    <h1><span>{{ streamRaiting }}</span> {{ streamTitle }}</h1>
 
     <p v-html="streamDesc"></p>
 
@@ -83,7 +83,9 @@ export default {
   data() {
     return {
       streamTitle: '',
+      streamRaiting: 0,
       streamLink: window.location.href,
+
       userId: '',
       userName: '',
       userAvatar: '',
@@ -150,6 +152,7 @@ export default {
           null,
           () => {
             // после получения данных о стриме
+            this.streamRaiting = this.stream.raiting;
             this.streamTitle = this.stream.settings.title;
             this.newStreamTitle = this.stream.settings.title;
             this.curRoundTime = this.stream.settings.roundtime;
@@ -276,6 +279,9 @@ export default {
             // 3.2 Прибавляем рейтинг записанный в this.stream.topusers к общему рейтингу пользователя
             // 3.3 Добавляем рейтинг в суммарный рейтинг по стриму в usersRef.child(item.userid).child('comments').push()
             usersRef.child(item.userid).update({ raiting: item.userraiting + item.raiting });
+            // 3.4 Добавляем рейтинг текущего комментария к общему рейтингу стрима
+            streamsRef.child(this.$route.params.streamLink).update({ raiting: this.stream.raiting + item.raiting });
+            this.streamRaiting = this.stream.raiting;
           }
         });
         // 4. Очищаем this.stream.temp.comments и this.stream.temp.liked
