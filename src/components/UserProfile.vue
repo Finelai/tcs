@@ -48,7 +48,7 @@
       <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink">
         <p>{{ streamComments.userRaitingByStream }} <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link></p>
         <ul>
-          <li v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
+          <li v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
             <p><strong>{{ oneComment.raiting }}</strong> {{ oneComment.comment }}</p>
           </li>
         </ul>
@@ -109,12 +109,11 @@ export default {
 
           // 1. Проверяем есть ли в user.comments записи
           if (this.user.comments !== 0) {
-            // 2. Проходим циклом по записям, берем user.comments[key] и получаем данные из streams
+            // 2. Проходим циклом по записям, берем user.comments[key] и получаем данные из streams/topcomments
             for (let key in this.user.comments) {
-              console.log(key, this.user.comments[key].raiting);
               this.$bindAsArray(
                 key,
-                streamsRef.child(key).child(`topcomments`).child(this.$route.params.userId),
+                streamsRef.child(key).child(`topcomments`),
                 null,
                 () => {
                   // 3. Записываем полученные комментарии в массив, а массив в общий объект

@@ -72,7 +72,7 @@
     </div>
 
     <div class="current">
-      <div class="current-topcomments">
+      <div v-if="streamCurrentComments.length > 0" class="current-topcomments">
         <h3>Лучшие комментарии текущего стрима</h3>
         <ul>
           <li v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']">
@@ -86,13 +86,41 @@
           </li>
         </ul>
       </div>
-      <div class="current-topusers">
-        <h3>Лучшие пользователи текущего стрима</h3>
+      <div v-if="streamCurrentUsers.length > 0" class="current-topusers">
+        <h3>Лучшие комментаторы текущего стрима</h3>
         <ul>
           <li v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']">
             <img width="30" height="30" v-bind:src="user.avatar">
             <p>
               <strong>{{ user.raiting }}</strong> | {{ user.name }}
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="top">
+      <div v-if="topUsers.length > 0" class="topusers">
+        <h3>Лучшие комментаторы за все время</h3>
+        <ul>
+          <li v-for="topuser in limitBy(orderBy(topUsers, 'raiting', -1), 10)" v-bind:key="topuser['.key']">
+            <img width="40" height="40" v-bind:src="topuser.avatar">
+            <p>
+              <strong>{{ topuser.raiting }}</strong> | {{ topuser.name }}
+            </p>
+          </li>
+        </ul>
+      </div>
+      <div v-if="topComments.length > 0" class="topcomments">
+        <h3>Лучшие комментарии за все время</h3>
+        <ul>
+          <li v-for="topcomment in limitBy(orderBy(topComments, 'raiting', -1), 10)" v-bind:key="topcomment['.key']">
+            <img width="30" height="30" v-bind:src="topcomment.useravatar">
+            <span>{{ topcomment.username }}</span>
+            <p>
+              {{ topcomment.comment }}
+              <br>
+              Raiting: {{ topcomment.raiting }}
             </p>
           </li>
         </ul>
@@ -142,6 +170,8 @@ export default {
     return {
       streamCurrentComments: streamsRef.child(`${this.$route.params.streamLink}/current/topcomments`),
       streamCurrentUsers: streamsRef.child(`${this.$route.params.streamLink}/current/topusers`),
+      topComments: streamsRef.child(`${this.$route.params.streamLink}/topcomments`),
+      topUsers: streamsRef.child(`${this.$route.params.streamLink}/topusers`),
     }
   },
   computed: {
@@ -290,7 +320,7 @@ export default {
               userid: item.userid,
             };
             streamsRef.child(this.$route.params.streamLink).child(`current/topcomments`).push(curComment);
-            streamsRef.child(this.$route.params.streamLink).child(`topcomments/${item.userid}`).push(curComment);
+            streamsRef.child(this.$route.params.streamLink).child(`topcomments`).push(curComment);
             // 3. Берем данные комментатора и записываем (update) в this.stream.current.topusers и в this.stream.topusers
             // 3.1 Если пользователь уже есть в this.stream.current.topusers или в this.stream.topusers, то увеличиваем его рейтинг на величину рейтинга комментария
             const curUser = {
