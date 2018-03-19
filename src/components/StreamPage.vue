@@ -193,14 +193,15 @@ export default {
     },
     // создать функцию, которая возвращает оставщееся время до конца раунда
     roundend() {
+      console.log(this.stream.temp.roundend);
       if (this.stream.temp.roundend) {
-        console.log(this.stream.temp.roundend);
         this.roundTimer = setInterval(() => {
             const curSec = new Date().getTime();
             console.log(curSec);
             if (curSec < this.stream.temp.roundend) {
               const diff = Math.floor((this.stream.temp.roundend - curSec) / 1000);
               this.cdRoundTime = diff;
+              if (diff === 1) { clearInterval(this.roundTimer); }
               return diff;
             } else {
               clearInterval(this.roundTimer);
@@ -427,7 +428,10 @@ export default {
       streamsRef.child(this.$route.params.streamLink).child('settings').update({ roundtime: this.newRoundTime });
       this.editRoundTime = false;
       this.curRoundTime = this.newRoundTime;
-      this.$toaster.success('Вы успешно сменили время раунда');
+      this.$message({
+          message: 'Вы успешно сменили время раунда',
+          type: 'success',
+      });
     },
     copyStreamLink() {
       const curProfileLink = document.querySelector('#streamLink');

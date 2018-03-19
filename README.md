@@ -7,6 +7,7 @@
 - vue2-filters
 - v-toaster
 - firebase
+- element
 
 ### structure:
 - - [ ] **sign-up & login** (создание аккаунта и вход с использованием firebase)

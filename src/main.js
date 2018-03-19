@@ -2,6 +2,13 @@
 
 import Vue from 'vue';
 
+// element
+import { Button, Message } from 'element-ui';
+import lang from 'element-ui/lib/locale/lang/en';
+import locale from 'element-ui/lib/locale';
+
+locale.use(lang);
+
 import '../config/firebase';
 import firebase from 'firebase';
 import VueFire from 'vuefire';
@@ -12,6 +19,9 @@ import router from './router';
 import Toaster from 'v-toaster';
 import Vue2Filters from 'vue2-filters';
 import 'v-toaster/dist/v-toaster.css';
+
+Vue.component(Button.name, Button)
+Vue.prototype.$message = Message;
 
 Vue.use(VueFire);
 Vue.use(Vue2Filters);
