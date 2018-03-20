@@ -4,12 +4,6 @@
     <h2>Список Пользователей</h2>
 
     <div>
-      <label>Имя</label>
-      <input type="text" v-model="name">
-      <button @click="submitName()">Добавить участника</button>
-    </div>
-
-    <div>
       <p><span @click="onlyStreamers = false">Все пользователи</span> / <span @click="onlyStreamers = true">Стримеры</span></p>
       <ul>
         <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of orderBy(users, 'raiting', -1)" v-bind:key="userName['.key']">
@@ -36,7 +30,6 @@ import { usersRef, db } from '../../config/firebase';
 export default {
   data() {
     return {
-      name: '',
       onlyStreamers: false,
     };
   },
@@ -45,26 +38,6 @@ export default {
     users: usersRef.orderByChild('raiting'),
   },
   methods: {
-    submitName() {
-      // this.$firebaseRefs.users.push({
-      //   name: this.name,
-      //   edit: false,
-      //   raiting: 0,
-      //   id: firebase.auth().currentUser.uid,
-      // });
-      const postData = {
-        name: this.name,
-        id: firebase.auth().currentUser.uid,
-        raiting: 0,
-      };
-
-      let updates = {};
-      updates[`/users/${postData.id}`] = postData;
-
-      this.name = '';
-      this.$toaster.success('New user added to database.');
-      return db.ref().update(updates);
-    },
     removeName(key) {
       usersRef.child(key).remove();
     },

@@ -29,7 +29,10 @@ export default {
           });
         },
         (err) => {
-          this.$toaster.error(`Error: ${err.message}`);
+          this.$message({
+            message: `Error: ${err.message}`,
+            type: 'error',
+          });
         },
       );
     },

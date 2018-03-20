@@ -158,14 +158,20 @@ export default {
       usersRef.child(firebase.auth().currentUser.uid).update({ name: this.updateName });
       this.userName = this.updateName;
       this.editName = false;
-      this.$toaster.success('Вы успешно сменили имя');
+      this.$message({
+        message: 'Вы успешно сменили имя',
+        type: 'success',
+      });
       this.updateName = '';
     },
     updateUserAvatar() {
       usersRef.child(firebase.auth().currentUser.uid).update({ avatar: this.updateAvatar });
       this.userAvatar = this.updateAvatar;
       this.editAvatar = false;
-      this.$toaster.success('Ваш аватар успешно заменен');
+      this.$message({
+        message: 'Ваш аватар успешно заменен',
+        type: 'success',
+      });
       this.updateAvatar = '';
     },
     copyProfileLink() {
@@ -180,10 +186,19 @@ export default {
       try {
         // Теперь, когда мы выбрали текст ссылки, выполним команду копирования
         document.execCommand('copy');
-        this.$toaster.success('Ссылка успешно скопирована.');
+        this.$message({
+          message: 'Ссылка успешно скопирована',
+          type: 'success',
+        });
       } catch (err) {
-        this.$toaster.error('Копирование невозможно в вашем браузере');
-        this.$toaster.info('Скопируйте ссылку вручную');
+        this.$message({
+          message: 'Копирование невозможно в вашем браузере',
+          type: 'error',
+        });
+        this.$message({
+          message: 'Скопируйте ссылку вручную',
+          type: 'warning',
+        });
       }
       // Снятие выделения
       window.getSelection().removeAllRanges();
@@ -193,11 +208,17 @@ export default {
         'stream',
         streamsRef.child(this.streamLink),
         () => {
-          this.$toaster.error('Потеряно соединение с базой данных. Попробуйте ещё раз!');
+          this.$message({
+            message: 'Потеряно соединение с базой данных. Попробуйте ещё раз!',
+            type: 'error',
+          });
         },
         () => {
           if (this.stream.streamer) {
-            this.$toaster.error(`Стрим c таким именем (${this.streamLink}) уже существует`);
+            this.$message({
+              message: `Стрим c таким названием (${this.streamLink}) уже существует`,
+              type: 'error',
+            });
           } else {
             usersRef.child(firebase.auth().currentUser.uid).update({ streamer: this.streamLink });
 
@@ -227,7 +248,10 @@ export default {
             updates[`/streams/${this.streamLink}`] = newStreamData;
             db.ref().update(updates);
             this.streamCreate = false;
-            this.$toaster.success(`Стрим ${this.streamTitle} успешно создан`);
+            this.$message({
+              message: `Стрим ${this.streamTitle} успешно создан`,
+              type: 'success',
+            });
             this.$router.replace('streamlist');
           }
         },

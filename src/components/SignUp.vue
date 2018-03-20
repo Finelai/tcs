@@ -57,11 +57,17 @@ export default {
 
           db.ref().update(updates);
 
-          this.$toaster.success(`Добро Пожаловать, ${this.name}`);
+          this.$message({
+            message: `Добро Пожаловать, ${this.name}`,
+            type: 'success',
+          });
           this.$router.replace('user');
         },
         (err) => {
-          this.$toaster.error(`Error: ${err.message}`);
+          this.$message({
+            message: `Error: ${err.message}`,
+            type: 'error',
+          });
         },
       );
     },

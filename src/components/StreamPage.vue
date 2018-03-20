@@ -270,10 +270,16 @@ export default {
         updates[`/temp/comments/${this.userId}`] = newTempComment;
         streamsRef.child(this.$route.params.streamLink).update(updates);
 
-        this.$toaster.success('Комментарий успешно опубликован');
+        this.$message({
+          message: 'Комментарий успешно опубликован',
+          type: 'success',
+        });
         this.userComment = '';
       } else {
-        this.$toaster.error('Вы уже оставляли комментарий в этом раунде');
+        this.$message({
+          message: 'Вы уже оставляли комментарий в этом раунде',
+          type: 'error',
+        });
       }
     },
     commentLike(commentId) {
@@ -282,7 +288,7 @@ export default {
       streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
       // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
       streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ like: commentId });
-      this.$toaster.info('Вы использовали свой лайк в этом раунде');
+      this.$message('Вы использовали свой лайк в этом раунде');
     },
     commentDislike(commentId) {
       // снижаем рейтинг комментария на единицу
@@ -290,7 +296,7 @@ export default {
       streamsRef.child(this.$route.params.streamLink).child('temp/comments/').child(commentId).update({ raiting: newRaiting });
       // записываем в liked uid текущего пользователя в качестве ключа и id комментария в значение
       streamsRef.child(this.$route.params.streamLink).child(`temp/liked/${this.userId}`).update({ dislike: commentId });
-      this.$toaster.info('Вы использовали свой дислайк в этом раунде');
+      this.$message('Вы использовали свой дислайк в этом раунде');
     },
     startStream() {
       // Вначале стрима очищаем this.stream.temp и this.stream.current без записи результатов
@@ -298,12 +304,15 @@ export default {
       streamsRef.child(this.$route.params.streamLink).child(`current`).update({ topcomments: 0, topusers: 0 });
       // если таймер 0, то весь стрим считается одним раундом
       if (this.curRoundTime !== 0) {
-        this.$toaster.success('Стрим запущен');
+        this.$message({
+          message: 'Стрим запущен',
+          type: 'success',
+        });
         const roundTimeMs = this.curRoundTime * 1000;
         this.timer = setInterval(() => {
           const roundEndMs = new Date().getTime() + roundTimeMs;
           streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: roundEndMs });
-          this.$toaster.info(`Раунд завершен!`);
+          this.$message(`Раунд завершен!`);
           // 1. Проверяем есть ли комментарии в this.temp.comments
           if (this.comments.length > 0) {
             // 2. Берем данные комментария и записываем их (push) в this.stream.current.topcomments и в this.stream.topcomments
@@ -410,19 +419,28 @@ export default {
       }
       // 5. this.stream.temp.roundend = 0
       streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: 0 });
-      this.$toaster.success('Вы успешно завершили стрим');
+      this.$message({
+          message: 'Вы успешно завершили стрим',
+          type: 'success',
+      });
     },
     updateStreamTitle() {
       streamsRef.child(this.$route.params.streamLink).child('settings').update({ title: this.newStreamTitle });
       this.editStreamTitle = false;
       this.streamTitle = this.newStreamTitle;
-      this.$toaster.success('Вы успешно сменили заголовок стрима');
+      this.$message({
+          message: 'Вы успешно сменили заголовок стрима',
+          type: 'success',
+      });
     },
     updateStreamDesc() {
       streamsRef.child(this.$route.params.streamLink).child('settings').update({ description: this.newStreamDesc });
       this.editStreamDesc = false;
       this.streamDesc = this.newStreamDesc;
-      this.$toaster.success('Вы успешно сменили описание стрима');
+      this.$message({
+          message: 'Вы успешно сменили описание стрима',
+          type: 'success',
+      });
     },
     updateRoundTime() {
       streamsRef.child(this.$route.params.streamLink).child('settings').update({ roundtime: this.newRoundTime });
@@ -445,10 +463,19 @@ export default {
       try {
         // Теперь, когда мы выбрали текст ссылки, выполним команду копирования
         document.execCommand('copy');
-        this.$toaster.success('Ссылка успешно скопирована.');
+        this.$message({
+          message: 'Ссылка успешно скопирована',
+          type: 'success',
+        });
       } catch (err) {
-        this.$toaster.error('Копирование невозможно в вашем браузере');
-        this.$toaster.info('Скопируйте ссылку вручную');
+        this.$message({
+          message: 'Копирование невозможно в вашем браузере',
+          type: 'error',
+        });
+        this.$message({
+          message: 'Скопируйте ссылку вручную',
+          type: 'warning',
+        });
       }
       // Снятие выделения
       window.getSelection().removeAllRanges();

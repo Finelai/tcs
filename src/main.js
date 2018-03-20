@@ -16,16 +16,13 @@ import VueFire from 'vuefire';
 import App from './App';
 import router from './router';
 
-import Toaster from 'v-toaster';
 import Vue2Filters from 'vue2-filters';
-import 'v-toaster/dist/v-toaster.css';
 
 Vue.component(Button.name, Button)
 Vue.prototype.$message = Message;
 
 Vue.use(VueFire);
 Vue.use(Vue2Filters);
-Vue.use(Toaster, {timeout: 3000});
 Vue.config.productionTip = false;
 
 let app;
