@@ -10,15 +10,15 @@
     <h2>Список <span v-if="!onlyStreamers">всех участников</span><span v-else>стримеров</span>, упорядоченный по рейтингу</h2>
 
     <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="4" v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of orderBy(users, 'raiting', -1)" v-bind:key="userName['.key']">
+      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="4" v-if="(!onlyStreamers && !user.streamer) || user.streamer" v-for="user of orderBy(users, 'raiting', -1)" v-bind:key="user['.key']">
         <el-card :body-style="{ padding: '0px', position: 'relative' }">
-          <img v-bind:src="userName.avatar" class="image">
-          <el-badge class="mark" :value="userName.raiting" />
+          <img v-bind:src="user.avatar" class="image">
+          <el-badge class="mark" :value="user.raiting"/>
           <div style="padding: 14px;">
-            <span><router-link :to="{ name: 'UserProfile', params: { userId: userName['.key'] } }">{{ userName.name }}</router-link></span>
+            <span><router-link :to="{ name: 'UserProfile', params: { userId: user['.key'] } }">{{ user.name }}</router-link></span>
             <div class="clearfix">
-              <span v-if="userName.streamer">
-                <router-link :to="{ name: 'StreamPage', params: { streamLink: userName.streamer } }">Перейти на стрим</router-link>
+              <span v-if="user.streamer">
+                <router-link :to="{ name: 'StreamPage', params: { streamLink: user.streamer } }">Перейти на стрим</router-link>
               </span>
               <el-button type="text" class="button" @click="followUser">Следить</el-button>
             </div>
@@ -31,8 +31,7 @@
 </template>
 
 <script>
-import firebase from 'firebase';
-import { usersRef, db } from '../../config/firebase';
+import { usersRef } from '../../config/firebase';
 
 export default {
   data() {
@@ -48,8 +47,8 @@ export default {
     // todo: реализовать follow
     followUser() {
       this.$message({
-          message: 'Вы подписались на обновления участника',
-          type: 'success',
+        message: 'Вы подписались на обновления участника',
+        type: 'success',
       });
     },
   },
@@ -78,7 +77,7 @@ export default {
       display: table;
       content: "";
   }
-  
+
   .clearfix:after {
       clear: both
   }

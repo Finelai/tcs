@@ -7,12 +7,12 @@
 
     <nav>
       <el-menu mode="horizontal" router>
-          <el-menu-item index="/streamlist">Список стримов</el-menu-item>
+          <el-menu-item index="/streamlist">Стримы</el-menu-item>
+          <el-menu-item index="/userlist">Участники</el-menu-item>
           <el-menu-item v-if="!userId" index="/sign-up">Регистрация</el-menu-item>
           <el-menu-item v-if="!userId" index="/login">Вход</el-menu-item>
           <el-menu-item index="/user">Профиль</el-menu-item>
           <el-menu-item v-if="streamLink !== 0" v-bind:index="streamLink">Стрим</el-menu-item>
-          <el-menu-item index="/userlist">Список участников</el-menu-item>
       </el-menu>
     </nav>
 
@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import { db } from '../config/firebase';
 import firebase from 'firebase';
+import { db } from '../config/firebase';
 
 export default {
   data() {
