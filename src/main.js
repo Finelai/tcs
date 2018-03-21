@@ -17,6 +17,14 @@ import {
   Submenu,
   MenuItem,
   MenuItemGroup,
+  Tabs,
+  TabPane,
+  Switch,
+  Table,
+  TableColumn,
+  Badge,
+  Card,
+  Rate,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -44,6 +52,14 @@ Vue.component(Menu.name, Menu);
 Vue.component(Submenu.name, Submenu);
 Vue.component(MenuItem.name, MenuItem);
 Vue.component(MenuItemGroup.name, MenuItemGroup);
+Vue.component(Tabs.name, Tabs);
+Vue.component(TabPane.name, TabPane);
+Vue.component(Switch.name, Switch);
+Vue.component(Table.name, Table);
+Vue.component(TableColumn.name, TableColumn);
+Vue.component(Badge.name, Badge);
+Vue.component(Card.name, Card);
+Vue.component(Rate.name, Rate);
 Vue.prototype.$message = Message;
 
 Vue.use(VueFire);

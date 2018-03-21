@@ -3,15 +3,18 @@
 
     <el-header>
       <h1>{{ title }}</h1>
-      <el-menu mode="horizontal" router>
-        <el-menu-item index="/streamlist">Список стримов</el-menu-item>
-        <el-menu-item v-if="!userId" index="/sign-up">Регистрация</el-menu-item>
-        <el-menu-item v-if="!userId" index="/login">Вход</el-menu-item>
-        <el-menu-item index="/user">Профиль</el-menu-item>
-        <el-menu-item v-if="streamLink !== 0" v-bind:index="streamLink">Стрим</el-menu-item>
-        <el-menu-item index="/userlist">Список участников</el-menu-item>
-      </el-menu>
     </el-header>
+
+    <nav>
+      <el-menu mode="horizontal" router>
+          <el-menu-item index="/streamlist">Список стримов</el-menu-item>
+          <el-menu-item v-if="!userId" index="/sign-up">Регистрация</el-menu-item>
+          <el-menu-item v-if="!userId" index="/login">Вход</el-menu-item>
+          <el-menu-item index="/user">Профиль</el-menu-item>
+          <el-menu-item v-if="streamLink !== 0" v-bind:index="streamLink">Стрим</el-menu-item>
+          <el-menu-item index="/userlist">Список участников</el-menu-item>
+      </el-menu>
+    </nav>
 
     <router-view/>
 

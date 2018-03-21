@@ -1,26 +1,33 @@
 <template>
-  <div class="user-list">
+  <el-main class="user-list">
 
-    <h2>Список Пользователей</h2>
+    <el-switch
+        v-model="onlyStreamers"
+        active-text="Только стримеры"
+        inactive-text="Все">
+    </el-switch>
 
-    <div>
-      <p><span @click="onlyStreamers = false">Все пользователи</span> / <span @click="onlyStreamers = true">Стримеры</span></p>
-      <ul>
-        <li v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of orderBy(users, 'raiting', -1)" v-bind:key="userName['.key']">
-          <p>
-            {{ userName.raiting }} |
-            <img width="100" height="100" v-bind:src="userName.avatar"> |
-            <router-link :to="{ name: 'UserProfile', params: { userId: userName['.key'] } }">{{ userName.name }}</router-link>
-            <span v-if="userName.streamer">|
-              <router-link :to="{ name: 'StreamPage', params: { streamLink: userName.streamer } }">Перейти на стрим</router-link>
-            </span>
-          </p>
-          <button @click="removeName(userName['.key'])">Удалить</button>
-        </li>
-      </ul>
-    </div>
+    <h2>Список <span v-if="!onlyStreamers">всех участников</span><span v-else>стримеров</span>, упорядоченный по рейтингу</h2>
 
-  </div>
+    <el-row :gutter="20">
+      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="4" v-if="(!onlyStreamers && !userName.streamer) || userName.streamer" v-for="userName of orderBy(users, 'raiting', -1)" v-bind:key="userName['.key']">
+        <el-card :body-style="{ padding: '0px', position: 'relative' }">
+          <img v-bind:src="userName.avatar" class="image">
+          <el-badge class="mark" :value="userName.raiting" />
+          <div style="padding: 14px;">
+            <span><router-link :to="{ name: 'UserProfile', params: { userId: userName['.key'] } }">{{ userName.name }}</router-link></span>
+            <div class="clearfix">
+              <span v-if="userName.streamer">
+                <router-link :to="{ name: 'StreamPage', params: { streamLink: userName.streamer } }">Перейти на стрим</router-link>
+              </span>
+              <el-button type="text" class="button" @click="followUser">Следить</el-button>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+  </el-main>
 </template>
 
 <script>
@@ -38,13 +45,41 @@ export default {
     users: usersRef.orderByChild('raiting'),
   },
   methods: {
-    removeName(key) {
-      usersRef.child(key).remove();
-    },
-    saveEdit(person) {
-      const key = person['.key'];
-      usersRef.child(key).set({ name: person.name, edit: false });
+    // todo: реализовать follow
+    followUser() {
+      this.$message({
+          message: 'Вы подписались на обновления участника',
+          type: 'success',
+      });
     },
   },
 };
 </script>
+
+<style>
+  .button {
+    padding: 0;
+    float: right;
+  }
+
+  .mark {
+    position: absolute;
+    top: 20px;
+    transform: translateY(-50%) translateX(30%);
+  }
+
+  .image {
+    width: 100%;
+    display: block;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+      display: table;
+      content: "";
+  }
+  
+  .clearfix:after {
+      clear: both
+  }
+</style>
