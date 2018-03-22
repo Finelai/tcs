@@ -10,7 +10,7 @@
     <h2>Список <span v-if="!onlyStreamers">всех участников</span><span v-else>стримеров</span>, упорядоченный по рейтингу</h2>
 
     <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="4" v-if="(!onlyStreamers && !user.streamer) || user.streamer" v-for="user of orderBy(users, 'raiting', -1)" v-bind:key="user['.key']">
+      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="3" v-if="(!onlyStreamers && !user.streamer) || user.streamer" v-for="user of orderBy(users, 'raiting', -1)" v-bind:key="user['.key']">
         <el-card :body-style="{ padding: '0px', position: 'relative' }">
           <img v-bind:src="user.avatar" class="image">
           <el-badge class="mark" :value="user.raiting"/>

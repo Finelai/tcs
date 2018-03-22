@@ -25,6 +25,9 @@ import {
   Badge,
   Card,
   Rate,
+  Form,
+  FormItem,
+  Input,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -41,6 +44,9 @@ import router from './router';
 import Vue2Filters from 'vue2-filters';
 
 Vue.component(Button.name, Button);
+Vue.component(Form.name, Form);
+Vue.component(FormItem.name, FormItem);
+Vue.component(Input.name, Input);
 Vue.component(Row.name, Row);
 Vue.component(Col.name, Col);
 Vue.component(Container.name, Container);
