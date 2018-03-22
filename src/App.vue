@@ -2,7 +2,7 @@
   <el-container id="app">
 
     <el-header>
-      <h1>{{ title }}</h1>
+      <h2>{{ title }}</h2>
     </el-header>
 
     <nav>

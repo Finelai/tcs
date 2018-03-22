@@ -1,45 +1,98 @@
 <template>
-  <div class="user-profile">
+  <el-main class="user-profile">
 
-    <h1><em>{{ userRaiting }}</em> {{ userName }}</h1>
+    <el-row type="flex" justify="end">
+      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" style="text-align:right;">
+        <el-form :inline="true">
+          <el-form-item label="Ссылка на профиль:">
+            <el-input v-model="profileLink" id="profileLink"></el-input>
+          </el-form-item>
+          <el-button @click="copyProfileLink" type="info" icon="el-icon-share">Копировать</el-button>
+        </el-form>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
+        <el-row>
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <img width="100" v-bind:src="userAvatar">
+          </el-col>
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <h1>{{ userName }}</h1>
+          </el-col>
+          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <div><i class="el-icon-star-on"></i> {{ userRaiting }}</div>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
+          <el-tabs type="border-card" v-if="owner">
 
-    <p><router-link v-if="streamer" :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Перейти на стрим</router-link></p>
+            <el-tab-pane>
+              <span slot="label"><i class="el-icon-info"></i> Информация</span>
+              <el-button @click="logout" type="info">Выйти</el-button>
+            </el-tab-pane>
 
-    <img width="100" v-bind:src="userAvatar">
+            <el-tab-pane>
+              <span slot="label"><i class="el-icon-date"></i> Сменить имя</span>
+              <div class="edit-name">
+                <p>Введите новое имя:</p>
+                <el-form :model="formData" :inline="true" :rules="rules" status-icon>
+                  <el-form-item prop="updateName">
+                    <el-input v-model="formData.updateName"></el-input>
+                  </el-form-item>
+                  <el-button @click="updateUserName" type="primary">Сменить</el-button>
+                </el-form>
+              </div>
+            </el-tab-pane>
 
-    <div class="edit-name" v-if="editName">
-      <label>Введите новое имя и нажмите Сохранить</label>
-      <input type="text" v-model="updateName">
-      <button v-on:click="updateUserName">Сохранить</button>
-    </div>
+            <el-tab-pane>
+              <span slot="label"><i class="el-icon-picture"></i> Сменить аватар</span>
+              <div class="edit-avatar">
+                <p>Вставьте ссылку на аватар:</p>
+                <el-form :inline="true">
+                  <el-form-item>
+                    <el-input v-model="updateAvatar"></el-input>
+                  </el-form-item>
+                  <el-button @click="updateUserAvatar" type="primary">Сменить</el-button>
+                </el-form>
+              </div>
+            </el-tab-pane>
 
-    <div class="edit-avatar" v-if="editAvatar">
-      <label>Вставьте ссылку на ваш аватар</label>
-      <input type="text" v-model="updateAvatar">
-      <button v-on:click="updateUserAvatar">Сохранить</button>
-    </div>
+            <el-tab-pane v-if="!streamer">
+              <span slot="label"><i class="el-icon-caret-right"></i> Стать стримером</span>
+              <div>
+                <el-form :model="formData" ref="formData" :rules="rules" status-icon>
+                  <el-form-item prop="streamTitle">
+                    <label>Название стрима (будет отображаться на странице):</label>
+                    <el-input v-model="formData.streamTitle" placeholder="Например, Vasya Stream"></el-input>
+                  </el-form-item>
+                  <el-form-item prop="streamLink">
+                    <label>Уникальная ссылка (латинские буквы, без цифр и спецсимволов):</label>
+                    <el-input v-model="formData.streamLink" placeholder="Например, vasya-stream"></el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button @click="createNewStream('formData')" type="primary">Создать</el-button>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-tab-pane>
 
-    <div v-if="owner">
-      <input type="text" id="profileLink" v-model="profileLink">
-      <span @click="copyProfileLink">Copy Link</span>
-      <button v-on:click="editName=!editName">Сменить имя</button>
-      <button v-on:click="editAvatar=!editAvatar">Сменить аватар</button>
-      <button v-on:click="logout">Выйти</button>
-      <br>
-      <button v-if="!streamer" v-on:click="streamCreate=!streamCreate">Стать стримером</button>
-    </div>
-
-    <div v-if="streamCreate">
-      <label>Название стрима (будет отображаться на странице):</label>
-      <br>
-      <input type="text" v-model="streamTitle">
-      <br>
-      <label>Ссылка (латинские, без цифр, уникальное):</label>
-      <br>
-      <input type="text" v-model="streamLink">
-      <br>
-      <button v-on:click="createNewStream">Создать</button>
-    </div>
+          </el-tabs>
+      </el-col>
+      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
+        <el-card v-if="streamer" :body-style="{ padding: '0px', position: 'relative' }">
+          <img src="http://via.placeholder.com/320x180" class="image">
+          <el-badge class="mark" :value="0"/>
+          <div style="padding: 14px;">
+            <span><router-link :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Перейти на стрим</router-link></span>
+            <div class="clearfix">
+              <el-button type="text" class="button" @click="followStream">Следить</el-button>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
 
     <div v-if="Object.keys(comments).length === 0 ">
       <p>У этого пользователя нет ни одного комментария с положительным рейтингом</p>
@@ -55,7 +108,7 @@
       </div>
     </div>
 
-  </div>
+  </el-main>
 </template>
 
 <script>
@@ -65,22 +118,44 @@ import { usersRef, streamsRef, db } from '../../config/firebase';
 export default {
   name: 'UserProfile',
   data() {
+    const validateStreamLink = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('Введите ссылку'));
+      } else if (value.length < 3) {
+        callback(new Error('Ссылка должен быть длинее 2х символов'));
+      } else if (/[^a-z\-]/.test(value)) {
+        callback(new Error('Только латинские буквы в нижнем регистре и тире'));
+      } else {
+        callback();
+      }
+    };
     return {
+      formData: {
+        updateName: '',
+        streamTitle: '',
+        streamLink: '',
+      },
+      rules: {
+        updateName: [
+          { min: 2, max: 30, message: 'Имя от 2 до 30 символов', trigger: 'blur' },
+        ],
+        streamTitle: [
+          { required: true, message: 'Укажите название стрима', trigger: 'blur' },
+          { min: 2, max: 30, message: 'Название от 2 до 30 символов', trigger: 'blur' },
+        ],
+        streamLink: [
+          { required: true, validator: validateStreamLink, trigger: 'blur' },
+        ],
+      },
       userName: '',
-      editName: false,
-      updateName: '',
 
       userAvatar: '',
-      editAvatar: false,
       updateAvatar: '',
 
       userRaiting: 0,
 
       owner: false,
       streamer: false,
-      streamCreate: false,
-      streamTitle: '',
-      streamLink: '',
       profileLink: '',
 
       comments: [],
@@ -155,19 +230,19 @@ export default {
       });
     },
     updateUserName() {
-      usersRef.child(firebase.auth().currentUser.uid).update({ name: this.updateName });
-      this.userName = this.updateName;
-      this.editName = false;
-      this.$message({
-        message: 'Вы успешно сменили имя',
-        type: 'success',
-      });
-      this.updateName = '';
+      if (this.formData.updateName !== '' && this.formData.updateName.length > 1) {
+        usersRef.child(firebase.auth().currentUser.uid).update({ name: this.formData.updateName });
+        this.userName = this.formData.updateName;
+        this.$message({
+          message: 'Вы успешно сменили имя',
+          type: 'success',
+        });
+        this.formData.updateName = '';
+      }
     },
     updateUserAvatar() {
       usersRef.child(firebase.auth().currentUser.uid).update({ avatar: this.updateAvatar });
       this.userAvatar = this.updateAvatar;
-      this.editAvatar = false;
       this.$message({
         message: 'Ваш аватар успешно заменен',
         type: 'success',
@@ -203,59 +278,75 @@ export default {
       // Снятие выделения
       window.getSelection().removeAllRanges();
     },
-    createNewStream() {
-      this.$bindAsObject(
-        'stream',
-        streamsRef.child(this.streamLink),
-        () => {
+    createNewStream(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$bindAsObject(
+            'stream',
+            streamsRef.child(this.formData.streamLink),
+            () => {
+              this.$message({
+                message: 'Потеряно соединение с базой данных. Попробуйте ещё раз!',
+                type: 'error',
+              });
+            },
+            () => {
+              if (this.stream.streamer) {
+                this.$message({
+                  message: `Стрим c таким названием (${this.formData.streamLink}) уже существует`,
+                  type: 'error',
+                });
+              } else {
+                usersRef.child(firebase.auth().currentUser.uid).update({ streamer: this.formData.streamLink });
+
+                const newStreamData = {
+                  streamerid: firebase.auth().currentUser.uid,
+                  streamername: this.userName,
+                  streameravatar: this.userAvatar,
+                  settings: {
+                    title: this.formData.streamTitle,
+                    roundtime: 60,
+                  },
+                  raiting: 0,
+                  topcomments: 0,
+                  topusers: 0,
+                  current: {
+                    topcomments: 0,
+                    topusers: 0,
+                  },
+                  temp: {
+                    roundend: 0,
+                    comments: 0,
+                    liked: 0,
+                  },
+                };
+
+                let updates = {};
+                updates[`/streams/${this.formData.streamLink}`] = newStreamData;
+                db.ref().update(updates);
+                this.$message({
+                  message: `Стрим ${this.formData.streamTitle} успешно создан`,
+                  type: 'success',
+                });
+                this.$router.replace('streamlist');
+              }
+            },
+          );
+        } else {
           this.$message({
-            message: 'Потеряно соединение с базой данных. Попробуйте ещё раз!',
+            message: 'Заполните все поля формы',
             type: 'error',
           });
-        },
-        () => {
-          if (this.stream.streamer) {
-            this.$message({
-              message: `Стрим c таким названием (${this.streamLink}) уже существует`,
-              type: 'error',
-            });
-          } else {
-            usersRef.child(firebase.auth().currentUser.uid).update({ streamer: this.streamLink });
-
-            const newStreamData = {
-              streamerid: firebase.auth().currentUser.uid,
-              streamername: this.userName,
-              streameravatar: this.userAvatar,
-              settings: {
-                title: this.streamTitle,
-                roundtime: 60,
-              },
-              raiting: 0,
-              topcomments: 0,
-              topusers: 0,
-              current: {
-                topcomments: 0,
-                topusers: 0,
-              },
-              temp: {
-                roundend: 0,
-                comments: 0,
-                liked: 0,
-              },
-            };
-
-            let updates = {};
-            updates[`/streams/${this.streamLink}`] = newStreamData;
-            db.ref().update(updates);
-            this.streamCreate = false;
-            this.$message({
-              message: `Стрим ${this.streamTitle} успешно создан`,
-              type: 'success',
-            });
-            this.$router.replace('streamlist');
-          }
-        },
-      );
+          return false;
+        }
+      });
+    },
+    followStream() {
+      // todo: реализовать follow
+      this.$message({
+        message: 'Вы подписались на оповещения о стриме',
+        type: 'success',
+      });
     },
   },
 };

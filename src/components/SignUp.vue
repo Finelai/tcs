@@ -2,7 +2,7 @@
   <el-main class="sign-up">
     <p>Мы вас не узнали.</p>
     <p>Создайте новый аккаунт или войдите.</p>
-    <el-form :model="regForm" :rules="rules" :status-icon="true" label-width="90px">
+    <el-form :model="regForm" :rules="rules" status-icon label-width="90px">
       <el-form-item label="Имя:" prop="name">
         <el-input v-model="regForm.name"></el-input>
       </el-form-item>

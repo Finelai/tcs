@@ -28,6 +28,7 @@ import {
   Form,
   FormItem,
   Input,
+  Icon,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -43,6 +44,7 @@ import router from './router';
 
 import Vue2Filters from 'vue2-filters';
 
+Vue.component(Icon.name, Icon);
 Vue.component(Button.name, Button);
 Vue.component(Form.name, Form);
 Vue.component(FormItem.name, FormItem);
