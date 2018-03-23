@@ -81,7 +81,7 @@
           </el-tabs>
       </el-col>
       <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-        <el-card v-if="streamer" :body-style="{ padding: '0px', position: 'relative' }">
+        <el-card style="max-width:320px;margin:0 auto;" v-if="streamer" :body-style="{ padding: '0px', position: 'relative' }">
           <img src="http://via.placeholder.com/320x180" class="image">
           <el-badge class="mark" :value="0"/>
           <div style="padding: 14px;">
@@ -97,14 +97,27 @@
     <div v-if="Object.keys(comments).length === 0 ">
       <p>У этого пользователя нет ни одного комментария с положительным рейтингом</p>
     </div>
-    <div v-else class="comments">
-      <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink">
-        <p>{{ streamComments.userRaitingByStream }} <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link></p>
-        <ul>
-          <li v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
-            <p><strong>{{ oneComment.raiting }}</strong> {{ oneComment.comment }}</p>
-          </li>
-        </ul>
+    <div v-else class="comments" style="max-width: 1200px;margin:0 auto;">
+      <h4>Комментарии, упорядоченные по рейтингу</h4>
+      <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink" style="margin-bottom: 40px;">
+        <el-row type="flex" justify="end">
+          <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" style="text-align:center;">
+            <el-button type="warning" icon="el-icon-star-on">{{ streamComments.userRaitingByStream }}</el-button> <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col>
+            <hr>
+          </el-col>
+        </el-row>
+        <el-row v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
+          <el-col :xs="4" :sm="4" :md="2" :lg="2" :xl="2" style="text-align:center;">
+            <el-button type="warning" icon="el-icon-star-on" plain>{{ oneComment.raiting }}</el-button>
+          </el-col>
+          <el-col :xs="20" :sm="20" :md="22" :lg="22" :xl="22" style="text-align:left;">
+            <p>{{ oneComment.comment }}</p>
+          </el-col>
+        </el-row>
       </div>
     </div>
 
@@ -123,7 +136,7 @@ export default {
         callback(new Error('Введите ссылку'));
       } else if (value.length < 3) {
         callback(new Error('Ссылка должен быть длинее 2х символов'));
-      } else if (/[^a-z\-]/.test(value)) {
+      } else if (/[^a-z-]/.test(value)) {
         callback(new Error('Только латинские буквы в нижнем регистре и тире'));
       } else {
         callback();
@@ -185,10 +198,10 @@ export default {
           // 1. Проверяем есть ли в user.comments записи
           if (this.user.comments !== 0) {
             // 2. Проходим циклом по записям, берем user.comments[key] и получаем данные из streams/topcomments
-            for (let key in this.user.comments) {
+            for (const key in this.user.comments) {
               this.$bindAsArray(
                 key,
-                streamsRef.child(key).child(`topcomments`),
+                streamsRef.child(key).child('topcomments'),
                 null,
                 () => {
                   // 3. Записываем полученные комментарии в массив, а массив в общий объект
@@ -219,8 +232,8 @@ export default {
       );
       if (firebase.auth().currentUser.uid === this.$route.params.userId) {
         this.owner = true;
-        this.profileLink = window.location.href;
       }
+      this.profileLink = window.location.href;
     }
   },
   methods: {
@@ -321,7 +334,7 @@ export default {
                   },
                 };
 
-                let updates = {};
+                const updates = {};
                 updates[`/streams/${this.formData.streamLink}`] = newStreamData;
                 db.ref().update(updates);
                 this.$message({

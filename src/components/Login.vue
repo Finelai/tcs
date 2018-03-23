@@ -52,7 +52,7 @@ export default {
       firebase.auth().signInWithEmailAndPassword(this.inForm.email, this.inForm.password).then(
         (user) => {
           this.$message({
-            message: `Добро пожаловать. Снова.`,
+            message: 'Добро пожаловать. Снова.',
             type: 'success',
           });
           this.$router.push({
