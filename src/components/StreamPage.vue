@@ -1,138 +1,218 @@
 <template>
-  <div class="stream-page">
+  <el-main class="stream-page">
 
-    <h1><span>{{ streamRaiting }}</span> {{ streamTitle }}</h1>
+    <el-row type="flex" justify="end">
+      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" style="text-align:right;">
+        <el-form :inline="true">
+          <el-form-item label="Ссылка на стрим:">
+            <el-input v-model="streamLink" id="streamLink"></el-input>
+          </el-form-item>
+          <el-button @click="copyStreamLink" type="info" icon="el-icon-share">Копировать</el-button>
+        </el-form>
+      </el-col>
+    </el-row>
 
-    <p v-html="streamDesc"></p>
+    <div style="text-align:center;display:inline-block;width:100%">
+      <i class="el-icon-star-on"></i> <span>{{ streamRaiting }}</span> <h1>{{ streamTitle }}</h1>
+      <el-button v-if="owner" type="text" @click="updateStreamTitle">Сменить заголовок</el-button>
+    </div>
 
-    <input type="text" id="streamLink" v-model="streamLink">
-    <span @click="copyStreamLink">Копировать ссылку на стрим</span>
-
-    <p>Осталось до конца раунда: <span>{{ cdRoundTime }}</span> {{ roundend }}</p>
-
-    <div class="comments">
-      <ul style="list-style-type: none;">
-        <li v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid">
-          <img width="50" height="50" v-bind:src="comment.useravatar">
-          <span>{{ comment.username }}</span>
-          <p>
-            {{ comment.comment }}
-            <br>
-            Raiting: {{ comment.raiting }}
-          </p>
-          <div v-if="comment.userid !== userId">
-            <div v-if="stream.temp.liked[userId] !== undefined">
-              <button v-if="stream.temp.liked[userId].like === undefined" @click="commentLike(comment.userid)">Like</button>
-              <button v-if="stream.temp.liked[userId].dislike === undefined" @click="commentDislike(comment.userid)">Dislike</button>
-            </div>
-            <div v-else>
-              <button @click="commentLike(comment.userid)">Like</button>
-              <button @click="commentDislike(comment.userid)">Dislike</button>
-            </div>
+    <el-row>
+      <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
+        <el-carousel v-if="topComments.length > 0" :interval="5000" type="card" height="600px">
+          <el-carousel-item v-for="topcomments in limitBy(topComments, 5)" :key="topcomments['.key']">
+            <img :src="topcomments.useravatar" width="50" height="50">
+            <p><strong>{{ topcomments.username }}:</strong> <br> {{ topcomments.comment }}</p>
+          </el-carousel-item>
+        </el-carousel>
+        <el-carousel v-else :interval="5000" type="card" height="600px">
+          <el-carousel-item>
+            <p>На этом стриме еще нет ни одного Лучшего комментария за все время</p>
+          </el-carousel-item>
+        </el-carousel>
+        <p v-html="streamDesc"></p>
+        <el-button v-if="owner" type="text" @click="editStreamDesc = !editStreamDesc">Сменить описание</el-button>
+        <div v-if="editStreamDesc">
+          <textarea cols="30" rows="10" v-model="newStreamDesc"></textarea>
+          <button @click="updateStreamDesc">Сохранить</button>
+        </div>
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+        <div class="comments">
+          <h6><i class="el-icon-info"></i> Оценивайте комментарии. У вас есть только 1 лайк и 1 дислайк в раунде.</h6>
+          <div v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid" style="margin-bottom:30px;">
+            <el-row>
+              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
+              <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
+                <img width="25" height="25" v-bind:src="comment.useravatar" style="vertical-align:bottom"><span>{{ comment.username }}:</span>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+                <el-rate
+                  v-model="comment.raiting"
+                  disabled
+                  show-score
+                  :low-threshold="10"
+                  :high-threshold="50"
+                  :max="1"
+                  :colors="['#99A9BF', '#FF9900', '#ff6969']">
+                </el-rate>
+              </el-col>
+              <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+                <p>{{ comment.comment }}</p>
+              </el-col>
+              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4" v-if="comment.userid !== userId">
+                <div v-if="stream.temp.liked[userId] !== undefined">
+                  <el-button v-if="stream.temp.liked[userId].like === undefined" type="success" icon="el-icon-caret-top" size="mini" @click="commentLike(comment.userid)"></el-button>
+                  <el-button v-if="stream.temp.liked[userId].dislike === undefined" type="danger" icon="el-icon-caret-bottom" size="mini" @click="commentDislike(comment.userid)"></el-button>
+                </div>
+                <div v-else>
+                  <el-button type="success" icon="el-icon-caret-top" size="mini" @click="commentLike(comment.userid)"></el-button>
+                  <el-button type="danger" icon="el-icon-caret-bottom" size="mini" @click="commentDislike(comment.userid)"></el-button>
+                </div>
+              </el-col>
+            </el-row>
           </div>
-        </li>
-      </ul>
-    </div>
+        </div>
 
-    <div class="streamer-settings" v-if="owner">
-      <button @click="startStream">Начать стрим</button>
-      <button @click="endStream">Завершить стрим</button>
+        <p>Осталось до конца раунда: <span>{{ cdRoundTime }}</span> {{ roundend }}</p>
 
-      <h3>Настройки</h3>
-      <p>
-        Текущая продолжительность раунда:
-        <strong v-if="!editRoundTime"> {{ curRoundTime }} секунд</strong>
-        <span v-else>
-          <input type="text" v-model="newRoundTime">
-          <button @click="updateRoundTime">Сохранить</button>
-        </span>
-      </p>
-      <button @click="editRoundTime = !editRoundTime">Сменить продолжительность раунда</button>
-      <button @click="editStreamTitle = !editStreamTitle">Сменить заголовок</button>
-      <button @click="editStreamDesc = !editStreamDesc">Сменить описание</button>
+        <div class="streamer-settings" v-if="owner">
+          <h3>Управление</h3>
+          <el-button type="success" @click="startStream">Начать стрим</el-button>
+          <el-button type="danger" @click="endStream">Завершить стрим</el-button>
 
-      <div v-if="editStreamTitle">
-        <input type="text" v-model="newStreamTitle">
-        <button @click="updateStreamTitle">Сохранить</button>
-      </div>
+          <p>Текущая продолжительность раунда: {{ curRoundTime }} сек.</p>
+          <el-button type="primary" @click="updateRoundTime">Изменить продолжительность раунда</el-button>
+        </div>
 
-      <div v-if="editStreamDesc">
-        <textarea cols="30" rows="10" v-model="newStreamDesc"></textarea>
-        <button @click="updateStreamDesc">Сохранить</button>
-      </div>
+        <div class="user-commentform" v-else>
+          <img width="25" height="25" v-bind:src="userAvatar"><span>{{ userName }}:</span>
+          <el-row>
+            <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
+              <el-input
+                type="textarea"
+                :autosize="{ minRows: 1, maxRows: 2}"
+                resize="none"
+                placeholder="Напишите свой комментарий"
+                v-model="userComment">
+              </el-input>
+            </el-col>
+            <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+              <el-button v-if="userComment !== ''" type="primary" size="small" @click="sendUserComment">Отправить</el-button>
+              <el-button v-else type="primary" size="small" disabled>Отправить</el-button>
+            </el-col>
+          </el-row>
+          <h6><i class="el-icon-info"></i> Вы можете отправить только 1 комментарий за раунд</h6>
+        </div>
+      </el-col>
+    </el-row>
 
-    </div>
-
-    <div class="user-commentform" v-else>
-      <span>{{ userName }}</span>
-      <img width="100" height="100" v-bind:src="userAvatar">
-      <br>
-      <textarea cols="30" rows="4" v-model='userComment'></textarea>
-      <button @click="sendUserComment">Отправить</button>
-    </div>
-
-    <div class="current">
-      <div v-if="streamCurrentComments.length > 0" class="current-topcomments">
+    <el-row class="current">
+      <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="streamCurrentComments.length > 0" class="current-topcomments">
         <h3>Лучшие комментарии текущего стрима</h3>
-        <ul>
-          <li v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']">
-            <img width="20" height="20" v-bind:src="comment.useravatar">
-            <span>{{ comment.username }}</span>
-            <p>
-              {{ comment.comment }}
-              <br>
-              Raiting: {{ comment.raiting }}
-            </p>
-          </li>
-        </ul>
-      </div>
-      <div v-if="streamCurrentUsers.length > 0" class="current-topusers">
+        <div v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']" style="margin-bottom:30px;">
+          <el-row>
+            <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
+            <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
+              <img width="25" height="25" v-bind:src="comment.useravatar" style="vertical-align:bottom"><span>{{ comment.username }}:</span>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+              <el-rate
+                v-model="comment.raiting"
+                disabled
+                show-score
+                :low-threshold="10"
+                :high-threshold="50"
+                :max="1"
+                :colors="['#99A9BF', '#FF9900', '#ff6969']">
+              </el-rate>
+            </el-col>
+            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+              <p>{{ comment.comment }}</p>
+            </el-col>
+          </el-row>
+        </div>
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="streamCurrentUsers.length > 0" class="current-topusers">
         <h3>Лучшие комментаторы текущего стрима</h3>
-        <ul>
-          <li v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']">
-            <img width="30" height="30" v-bind:src="user.avatar">
-            <p>
-              <strong>{{ user.raiting }}</strong> | {{ user.name }}
-            </p>
-          </li>
-        </ul>
-      </div>
-    </div>
+        <el-row v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']" style="margin-bottom:30px;">
+          <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+            <el-rate
+              v-model="user.raiting"
+              disabled
+              show-score
+              :low-threshold="50"
+              :high-threshold="100"
+              :max="1"
+              :colors="['#99A9BF', '#FF9900', '#ff6969']">
+            </el-rate>
+          </el-col>
+          <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
+            <img width="40" height="40" v-bind:src="user.avatar" style="vertical-align:bottom"><span>{{ user.name }}</span>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
 
-    <div class="top">
-      <div v-if="topUsers.length > 0" class="topusers">
-        <h3>Лучшие комментаторы за все время</h3>
-        <ul>
-          <li v-for="topuser in limitBy(orderBy(topUsers, 'raiting', -1), 10)" v-bind:key="topuser['.key']">
-            <img width="40" height="40" v-bind:src="topuser.avatar">
-            <p>
-              <strong>{{ topuser.raiting }}</strong> | {{ topuser.name }}
-            </p>
-          </li>
-        </ul>
-      </div>
-      <div v-if="topComments.length > 0" class="topcomments">
+    <el-row class="top">
+      <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="topComments.length > 0" class="topcomments">
         <h3>Лучшие комментарии за все время</h3>
-        <ul>
-          <li v-for="topcomment in limitBy(orderBy(topComments, 'raiting', -1), 10)" v-bind:key="topcomment['.key']">
-            <img width="30" height="30" v-bind:src="topcomment.useravatar">
-            <span>{{ topcomment.username }}</span>
-            <p>
-              {{ topcomment.comment }}
-              <br>
-              Raiting: {{ topcomment.raiting }}
-            </p>
-          </li>
-        </ul>
-      </div>
-    </div>
+        <div v-for="topcomment in limitBy(orderBy(topComments, 'raiting', -1), 10)" v-bind:key="topcomment['.key']" style="margin-bottom:30px;">
+          <el-row>
+            <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
+            <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
+              <img width="25" height="25" v-bind:src="topcomment.useravatar" style="vertical-align:bottom"><span>{{ topcomment.username }}:</span>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+              <el-rate
+                v-model="topcomment.raiting"
+                disabled
+                show-score
+                :low-threshold="10"
+                :high-threshold="50"
+                :max="1"
+                :colors="['#99A9BF', '#FF9900', '#ff6969']">
+              </el-rate>
+            </el-col>
+            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+              <p>{{ topcomment.comment }}</p>
+            </el-col>
+          </el-row>
+        </div>
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="topUsers.length > 0" class="topusers">
+        <h3>Лучшие комментаторы за все время</h3>
+        <el-row v-for="topuser in limitBy(orderBy(topUsers, 'raiting', -1), 10)" v-bind:key="topuser['.key']" style="margin-bottom:30px;">
+          <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+            <el-rate
+              v-model="topuser.raiting"
+              disabled
+              show-score
+              :low-threshold="100"
+              :high-threshold="500"
+              :max="1"
+              :colors="['#99A9BF', '#FF9900', '#ff6969']">
+            </el-rate>
+          </el-col>
+          <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
+            <img width="40" height="40" v-bind:src="topuser.avatar" style="vertical-align:bottom"><span>{{ topuser.name }}</span>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
 
-  </div>
+  </el-main>
 </template>
 
 <script>
 import firebase from 'firebase';
-import { usersRef, streamsRef, db } from '../../config/firebase';
+import { usersRef, streamsRef } from '../../config/firebase';
 
 export default {
   name: 'StreamPage',
@@ -151,11 +231,6 @@ export default {
       owner: false,
 
       curRoundTime: 0,
-      editRoundTime: false,
-      newRoundTime: 0,
-
-      editStreamTitle: false,
-      newStreamTitle: '',
 
       streamDesc: 'Стример ещё не добавил описание к стриму',
       editStreamDesc: false,
@@ -172,7 +247,7 @@ export default {
       streamCurrentUsers: streamsRef.child(`${this.$route.params.streamLink}/current/topusers`),
       topComments: streamsRef.child(`${this.$route.params.streamLink}/topcomments`),
       topUsers: streamsRef.child(`${this.$route.params.streamLink}/topusers`),
-    }
+    };
   },
   computed: {
     comments() {
@@ -183,7 +258,7 @@ export default {
         //   newObj.userid = Object.keys(this.stream.temp.comments)[x];
         //   newCommentsArr.push(newObj);
         // }
-        for (let key in this.stream.temp.comments) {
+        for (const key in this.stream.temp.comments) {
           let newObj = this.stream.temp.comments[key];
           newObj.userid = key;
           newCommentsArr.push(newObj);
@@ -193,20 +268,18 @@ export default {
     },
     // создать функцию, которая возвращает оставщееся время до конца раунда
     roundend() {
-      console.log(this.stream.temp.roundend);
       if (this.stream.temp.roundend) {
         this.roundTimer = setInterval(() => {
-            const curSec = new Date().getTime();
-            console.log(curSec);
-            if (curSec < this.stream.temp.roundend) {
-              const diff = Math.floor((this.stream.temp.roundend - curSec) / 1000);
-              this.cdRoundTime = diff;
-              if (diff === 1) { clearInterval(this.roundTimer); }
-              return diff;
-            } else {
-              clearInterval(this.roundTimer);
-              return 'x';
-            }
+          const curSec = new Date().getTime();
+          if (curSec < this.stream.temp.roundend) {
+            const diff = Math.floor((this.stream.temp.roundend - curSec) / 1000);
+            this.cdRoundTime = diff;
+            if (diff === 1) { clearInterval(this.roundTimer); }
+            return diff;
+          } else if (curSec >= this.stream.temp.roundend) {
+            clearInterval(this.roundTimer);
+          }
+          return 'x';
         }, 1000);
       }
     },
@@ -223,9 +296,7 @@ export default {
             // после получения данных о стриме
             this.streamRaiting = this.stream.raiting;
             this.streamTitle = this.stream.settings.title;
-            this.newStreamTitle = this.stream.settings.title;
             this.curRoundTime = this.stream.settings.roundtime;
-            this.newRoundTime = this.stream.settings.roundtime;
             if (this.stream.settings.description) {
               this.streamDesc = this.stream.settings.description;
               this.newStreamDesc = this.stream.settings.description;
@@ -266,7 +337,7 @@ export default {
           comment: this.userComment,
           raiting: 0,
         };
-        let updates = {};
+        const updates = {};
         updates[`/temp/comments/${this.userId}`] = newTempComment;
         streamsRef.child(this.$route.params.streamLink).update(updates);
 
@@ -300,8 +371,8 @@ export default {
     },
     startStream() {
       // Вначале стрима очищаем this.stream.temp и this.stream.current без записи результатов
-      streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ comments: 0, liked: 0 });
-      streamsRef.child(this.$route.params.streamLink).child(`current`).update({ topcomments: 0, topusers: 0 });
+      streamsRef.child(this.$route.params.streamLink).child('temp').update({ comments: 0, liked: 0 });
+      streamsRef.child(this.$route.params.streamLink).child('current').update({ topcomments: 0, topusers: 0 });
       // если таймер 0, то весь стрим считается одним раундом
       if (this.curRoundTime !== 0) {
         this.$message({
@@ -311,8 +382,8 @@ export default {
         const roundTimeMs = this.curRoundTime * 1000;
         this.timer = setInterval(() => {
           const roundEndMs = new Date().getTime() + roundTimeMs;
-          streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: roundEndMs });
-          this.$message(`Раунд завершен!`);
+          streamsRef.child(this.$route.params.streamLink).child('temp').update({ roundend: roundEndMs });
+          this.$message('Раунд завершен!');
           // 1. Проверяем есть ли комментарии в this.temp.comments
           if (this.comments.length > 0) {
             // 2. Берем данные комментария и записываем их (push) в this.stream.current.topcomments и в this.stream.topcomments
@@ -326,8 +397,8 @@ export default {
                   userraiting: item.userraiting, /* outdated */
                   userid: item.userid,
                 };
-                streamsRef.child(this.$route.params.streamLink).child(`current/topcomments`).push(curComment);
-                streamsRef.child(this.$route.params.streamLink).child(`topcomments`).push(curComment);
+                streamsRef.child(this.$route.params.streamLink).child('current/topcomments').push(curComment);
+                streamsRef.child(this.$route.params.streamLink).child('topcomments').push(curComment);
                 // 3. Берем данные комментатора и записываем (update) в this.stream.current.topusers и в this.stream.topusers
                 // 3.1 Если пользователь уже есть в this.stream.current.topusers или в this.stream.topusers, то увеличиваем его рейтинг на величину рейтинга комментария
                 const curUser = {
@@ -360,7 +431,7 @@ export default {
               }
             });
             // 4. Очищаем this.stream.temp.comments и this.stream.temp.liked
-            streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ comments: 0, liked: 0 });
+            streamsRef.child(this.$route.params.streamLink).child('temp').update({ comments: 0, liked: 0 });
           }
         }, roundTimeMs);
       }
@@ -381,8 +452,8 @@ export default {
               userraiting: item.userraiting, /* outdated */
               userid: item.userid,
             };
-            streamsRef.child(this.$route.params.streamLink).child(`current/topcomments`).push(curComment);
-            streamsRef.child(this.$route.params.streamLink).child(`topcomments`).push(curComment);
+            streamsRef.child(this.$route.params.streamLink).child('current/topcomments').push(curComment);
+            streamsRef.child(this.$route.params.streamLink).child('topcomments').push(curComment);
             // 3. Берем данные комментатора и записываем (update) в this.stream.current.topusers и в this.stream.topusers
             // 3.1 Если пользователь уже есть в this.stream.current.topusers или в this.stream.topusers, то увеличиваем его рейтинг на величину рейтинга комментария
             const curUser = {
@@ -415,22 +486,40 @@ export default {
           }
         });
         // 4. Очищаем this.stream.temp.comments и this.stream.temp.liked
-        streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ comments: 0, liked: 0 });
+        streamsRef.child(this.$route.params.streamLink).child('temp').update({ comments: 0, liked: 0 });
       }
       // 5. this.stream.temp.roundend = 0
-      streamsRef.child(this.$route.params.streamLink).child(`temp`).update({ roundend: 0 });
+      streamsRef.child(this.$route.params.streamLink).child('temp').update({ roundend: 0 });
       this.$message({
-          message: 'Вы успешно завершили стрим',
-          type: 'success',
+        message: 'Вы успешно завершили стрим',
+        type: 'success',
       });
     },
     updateStreamTitle() {
-      streamsRef.child(this.$route.params.streamLink).child('settings').update({ title: this.newStreamTitle });
-      this.editStreamTitle = false;
-      this.streamTitle = this.newStreamTitle;
-      this.$message({
-          message: 'Вы успешно сменили заголовок стрима',
+      this.$prompt('Введите новое название:', 'Смена названия стрима', {
+        confirmButtonText: 'Сохранить',
+        cancelButtonText: 'Отмена',
+        inputPlaceholder: this.streamTitle,
+        inputValidator: (value) => {
+          if (value === '') {
+            return 'Введите название';
+          } else if (value.length < 2 || value.length > 30) {
+            return 'Названи должно быть от 2-х до 30-ти символов';
+          }
+          return true;
+        },
+      }).then(result => {
+        streamsRef.child(this.$route.params.streamLink).child('settings').update({ title: result.value });
+        this.streamTitle = result.value;
+        this.$message({
           type: 'success',
+          message: 'Вы успешно сменили заголовок стрима на:' + result.value,
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'error',
+          message: 'Ошибка',
+        });
       });
     },
     updateStreamDesc() {
@@ -438,17 +527,28 @@ export default {
       this.editStreamDesc = false;
       this.streamDesc = this.newStreamDesc;
       this.$message({
-          message: 'Вы успешно сменили описание стрима',
-          type: 'success',
+        message: 'Вы успешно сменили описание стрима',
+        type: 'success',
       });
     },
     updateRoundTime() {
-      streamsRef.child(this.$route.params.streamLink).child('settings').update({ roundtime: this.newRoundTime });
-      this.editRoundTime = false;
-      this.curRoundTime = this.newRoundTime;
-      this.$message({
-          message: 'Вы успешно сменили время раунда',
+      this.$prompt('Введите новое время раунда в секундах', 'Продолжительность раунда', {
+        confirmButtonText: 'Сохранить',
+        cancelButtonText: 'Отмена',
+        inputPattern: /^\d+$/,
+        inputErrorMessage: 'Только цифры'
+      }).then(result => {
+        streamsRef.child(this.$route.params.streamLink).child('settings').update({ roundtime: result.value });
+        this.curRoundTime = result.value;
+        this.$message({
           type: 'success',
+          message: 'Новое время раунда:' + result.value,
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Ошибка',
+        });
       });
     },
     copyStreamLink() {
@@ -486,3 +586,27 @@ export default {
   },
 };
 </script>
+
+<style>
+  .el-carousel__item img {
+    width: 100%;
+    height: 100%;
+    opacity: .1;
+  }
+  .el-carousel__item p {
+    color: #000;
+    opacity: 0.75;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+  }
+  .el-carousel__item:nth-child(2n) {
+    background-color: #99a9bf;
+  }
+
+  .el-carousel__item:nth-child(2n+1) {
+    background-color: #d3dce6;
+  }
+</style>

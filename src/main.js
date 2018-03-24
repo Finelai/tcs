@@ -6,6 +6,7 @@ import Vue from 'vue';
 import {
   Button,
   Message,
+  MessageBox,
   Row,
   Col,
   Container,
@@ -29,6 +30,8 @@ import {
   FormItem,
   Input,
   Icon,
+  Carousel,
+  CarouselItem,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -46,6 +49,8 @@ import Vue2Filters from 'vue2-filters';
 
 Vue.component(Icon.name, Icon);
 Vue.component(Button.name, Button);
+Vue.component(Carousel.name, Carousel);
+Vue.component(CarouselItem.name, CarouselItem);
 Vue.component(Form.name, Form);
 Vue.component(FormItem.name, FormItem);
 Vue.component(Input.name, Input);
@@ -69,6 +74,7 @@ Vue.component(Badge.name, Badge);
 Vue.component(Card.name, Card);
 Vue.component(Rate.name, Rate);
 Vue.prototype.$message = Message;
+Vue.prototype.$prompt = MessageBox.prompt;
 
 Vue.use(VueFire);
 Vue.use(Vue2Filters);
