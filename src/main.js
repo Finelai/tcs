@@ -2,6 +2,8 @@
 
 import Vue from 'vue';
 
+import './assets/scss/_global.scss';
+
 // element
 import {
   Button,

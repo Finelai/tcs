@@ -6,6 +6,7 @@
 - vue2-filters
 - firebase
 - element
+- sass
 
 ### structure:
 - - [x] **sign-up & login** (создание аккаунта и вход с использованием firebase)

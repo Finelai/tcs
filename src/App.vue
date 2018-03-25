@@ -48,4 +48,7 @@ export default {
     }
   },
 };
+// <style src="./assets/scss/_global.scss" lang="scss"></style>
 </script>
+
+
