@@ -15,11 +15,11 @@ const router = new Router({
   routes: [
     {
       path: '*',
-      redirect: '/login',
+      redirect: '/streamlist',
     },
     {
       path: '/',
-      redirect: '/login',
+      redirect: '/streamlist',
     },
     {
       path: '/login',
@@ -35,51 +35,23 @@ const router = new Router({
       path: '/user/:userId',
       name: 'UserProfile',
       component: UserProfile,
-      meta: {
-        requiresAuth: true,
-      },
     },
     {
       path: '/userlist',
       name: 'UserList',
       component: UserList,
-      meta: {
-        requiresAuth: true,
-      },
     },
     {
       path: '/stream/:streamLink',
       name: 'StreamPage',
       component: StreamPage,
-      meta: {
-        requiresAuth: true,
-      },
     },
     {
       path: '/streamlist',
       name: 'StreamList',
       component: StreamList,
-      meta: {
-        requiresAuth: true,
-      },
     },
   ],
-});
-
-router.beforeEach((to, from, next) => {
-  // Check if firebase detect user id
-  const currentUser = firebase.auth().currentUser;
-  // Check if current link auth required
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
-  // Check auth required and this is not a user - > redirect to login
-  if (requiresAuth && !currentUser) {
-    next('login');
-  } else if (!requiresAuth && currentUser) {
-    router.push({ name: 'UserProfile', params: { userId: currentUser.uid } });
-  } else {
-    next();
-  }
 });
 
 export default router;

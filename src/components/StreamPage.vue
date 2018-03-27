@@ -253,11 +253,6 @@ export default {
     comments() {
       let newCommentsArr = [];
       if (this.stream.temp.comments) {
-        // for (let x = 0; x < Object.keys(this.stream.temp.comments).length; x += 1) {
-        //   let newObj = this.stream.temp.comments[Object.keys(this.stream.temp.comments)[x]];
-        //   newObj.userid = Object.keys(this.stream.temp.comments)[x];
-        //   newCommentsArr.push(newObj);
-        // }
         for (const key in this.stream.temp.comments) {
           let newObj = this.stream.temp.comments[key];
           newObj.userid = key;
@@ -285,7 +280,12 @@ export default {
     },
   },
   created() {
-    this.userId = firebase.auth().currentUser.uid;
+    if (firebase.auth().currentUser) {
+      this.userId = firebase.auth().currentUser.uid;
+    } else {
+      this.$router.push({ name: 'Login' });
+    }
+
     if (this.userId && this.$route.params.streamLink) {
       this.$watch('stream', () => {
         this.$bindAsObject(

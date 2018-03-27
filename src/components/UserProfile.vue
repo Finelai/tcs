@@ -169,22 +169,23 @@ export default {
 
       owner: false,
       streamer: false,
-      profileLink: '',
+      profileLink: window.location.href,
 
       comments: [],
     };
   },
   created() {
-    // отображение ссылки пользователя
-    if (firebase.auth().currentUser && !this.$route.params.userId) {
-      this.$router.push({ name: 'UserProfile', params: { userId: firebase.auth().currentUser.uid } });
+    if (firebase.auth().currentUser) {
+      if (firebase.auth().currentUser.uid === this.$route.params.userId) {
+        this.owner = true;
+      }
     }
 
     // TODO: Создание ссылки на страницу пользователя заданного вида
     // а если в базе данных у этого пользователя создана запись link, то пушем не id пользователя а link
     // после чего берем this.$route.params.userId и ищем в бд пользователя с таким id, после чего получаем его данные в объекте
 
-    if (firebase.auth().currentUser.uid && this.$route.params.userId) {
+    if (this.$route.params.userId) {
       this.$bindAsObject(
         'user',
         usersRef.child(this.$route.params.userId),
@@ -230,10 +231,6 @@ export default {
           }
         },
       );
-      if (firebase.auth().currentUser.uid === this.$route.params.userId) {
-        this.owner = true;
-      }
-      this.profileLink = window.location.href;
     }
   },
   methods: {

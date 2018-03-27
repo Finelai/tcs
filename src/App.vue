@@ -6,13 +6,25 @@
     </el-header>
 
     <nav>
-      <el-menu mode="horizontal" router>
-          <el-menu-item index="/streamlist">Стримы</el-menu-item>
-          <el-menu-item index="/userlist">Участники</el-menu-item>
-          <el-menu-item v-if="!userId" index="/sign-up">Регистрация</el-menu-item>
-          <el-menu-item v-if="!userId" index="/login">Вход</el-menu-item>
-          <el-menu-item index="/user">Профиль</el-menu-item>
-          <el-menu-item v-if="streamLink !== 0" v-bind:index="streamLink">Стрим</el-menu-item>
+      <el-menu mode="horizontal">
+          <el-menu-item index="StreamList">
+            <router-link :to="{ name: 'StreamList' }">Стримы</router-link>
+          </el-menu-item>
+          <el-menu-item index="UserList">
+            <router-link :to="{ name: 'UserList' }">Участники</router-link>
+          </el-menu-item>
+          <el-menu-item index="SignUp" v-if="!userId">
+            <router-link :to="{ name: 'SignUp' }">Регистрация</router-link>
+          </el-menu-item>
+          <el-menu-item index="Login" v-if="!userId">
+            <router-link :to="{ name: 'Login' }">Вход</router-link>
+          </el-menu-item>
+          <el-menu-item index="UserProfile" v-if="userId">
+            <router-link :to="{ name: 'UserProfile', params: { userId: userId }}">Мой профиль</router-link>
+          </el-menu-item>
+          <el-menu-item index="StreamPage" v-if="streamLink">
+            <router-link :to="{ name: 'StreamPage', params: { streamLink: streamLink }}">Мой стрим</router-link>
+          </el-menu-item>
       </el-menu>
     </nav>
 
@@ -33,22 +45,21 @@ export default {
     return {
       title: 'Top Comment System',
       userId: 0,
-      streamLink: 0,
+      streamLink: undefined,
       currentYear: new Date().getFullYear(),
     };
   },
   created() {
-    this.userId = firebase.auth().currentUser.uid;
+    if (firebase.auth().currentUser) {
+      this.userId = firebase.auth().currentUser.uid;
+    }
     if (this.userId) {
       db.ref(`/users/${this.userId}`).once('value').then((snapshot) => {
         if (snapshot.val().streamer !== 0) {
-          this.streamLink = `stream/${snapshot.val().streamer}`;
+          this.streamLink = snapshot.val().streamer;
         }
       });
     }
   },
 };
-// <style src="./assets/scss/_global.scss" lang="scss"></style>
 </script>
-
-
