@@ -28,7 +28,9 @@
       </el-menu>
     </nav>
 
-    <router-view/>
+    <transition :name="transitionName">
+      <router-view/>
+    </transition>
 
     <el-footer>
       <p>{{ currentYear }} &copy; {{ title }}</p>
@@ -47,7 +49,15 @@ export default {
       userId: 0,
       streamLink: undefined,
       currentYear: new Date().getFullYear(),
+      transitionName: '',
     };
+  },
+  watch: {
+    '$route' (to, from) {
+      const toDepth = to.path.split('/').length;
+      const fromDepth = from.path.split('/').length;
+      this.transitionName = toDepth < fromDepth ? 'slide-top' : 'slide-bot';
+    },
   },
   created() {
     if (firebase.auth().currentUser) {

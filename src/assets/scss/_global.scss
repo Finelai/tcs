@@ -2,6 +2,31 @@
 @import './normalize/_vertical-rhythm.scss';
 @import './normalize/_normalize.scss';
 
-$--font-path: '~element-ui/lib/theme-chalk/fonts';
+// $--font-path: '~element-ui/lib/theme-chalk/fonts';
 
-@import "~element-ui/packages/theme-chalk/src/index";
+// @import "~element-ui/packages/theme-chalk/src/index";
+
+
+/* Transitions */
+
+.slide-top-enter-active {
+  transition: all .4s ease;
+}
+.slide-top-leave-active {
+  transition: all .2s ease;
+}
+.slide-top-enter, .slide-top-leave-to {
+  transform: translateY(-50%);
+  opacity: 0;
+}
+
+.slide-bot-enter-active {
+  transition: all .4s ease;
+}
+.slide-bot-leave-active {
+  transition: all .2s ease;
+}
+.slide-bot-enter, .slide-bot-leave-to {
+  transform: translateY(50%);
+  opacity: 0;
+}
