@@ -316,6 +316,7 @@ export default {
                   settings: {
                     title: this.formData.streamTitle,
                     roundtime: 60,
+                    preview: 'http://via.placeholder.com/320x180',
                   },
                   raiting: 0,
                   topcomments: 0,
@@ -338,7 +339,7 @@ export default {
                   message: `Стрим ${this.formData.streamTitle} успешно создан`,
                   type: 'success',
                 });
-                this.$router.replace('streamlist');
+                this.$router.push({ name: 'StreamList' });
               }
             },
           );

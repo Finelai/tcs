@@ -7,6 +7,13 @@
 // @import "~element-ui/packages/theme-chalk/src/index";
 
 
+/* General */
+
+a {
+  text-decoration: none;
+}
+
+
 /* Transitions */
 
 .slide-top-enter-active {
@@ -29,4 +36,13 @@
 .slide-bot-enter, .slide-bot-leave-to {
   transform: translateY(50%);
   opacity: 0;
+}
+
+
+/* Top Nav Menu */
+
+.top-menu {
+  a {
+    text-decoration: none;
+  }
 }

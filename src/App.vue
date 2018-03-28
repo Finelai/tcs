@@ -5,7 +5,7 @@
       <h2>{{ title }}</h2>
     </el-header>
 
-    <nav>
+    <nav class="top-menu">
       <el-menu mode="horizontal">
           <el-menu-item index="StreamList">
             <router-link :to="{ name: 'StreamList' }">Стримы</router-link>
@@ -33,7 +33,7 @@
     </transition>
 
     <el-footer>
-      <p>{{ currentYear }} &copy; {{ title }}</p>
+      <p>{{ currentYear }} &copy; {{ title }} | <a href="https://github.com/Finelai/tcs" target="_blank">GitHub</a></p>
     </el-footer>
   </el-container>
 </template>

@@ -85,6 +85,9 @@
 
           <p>Текущая продолжительность раунда: {{ curRoundTime }} сек.</p>
           <el-button type="primary" @click="updateRoundTime">Изменить продолжительность раунда</el-button>
+
+          <img :src="curPreview">
+          <el-button type="primary" @click="updatePreview">Сменить превью</el-button>
         </div>
 
         <div class="user-commentform" v-else>
@@ -232,6 +235,8 @@ export default {
 
       curRoundTime: 0,
 
+      curPreview: '',
+
       streamDesc: 'Стример ещё не добавил описание к стриму',
       editStreamDesc: false,
       newStreamDesc: '',
@@ -297,6 +302,7 @@ export default {
             this.streamRaiting = this.stream.raiting;
             this.streamTitle = this.stream.settings.title;
             this.curRoundTime = this.stream.settings.roundtime;
+            this.curPreview = this.stream.settings.preview;
             if (this.stream.settings.description) {
               this.streamDesc = this.stream.settings.description;
               this.newStreamDesc = this.stream.settings.description;
@@ -543,6 +549,24 @@ export default {
         this.$message({
           type: 'success',
           message: 'Новое время раунда:' + result.value,
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Ошибка',
+        });
+      });
+    },
+    updatePreview() {
+      this.$prompt('Вставьте ссылку на новое превью', 'Превью', {
+        confirmButtonText: 'Сохранить',
+        cancelButtonText: 'Отмена',
+      }).then(result => {
+        streamsRef.child(this.$route.params.streamLink).child('settings').update({ preview: result.value });
+        this.curPreview = result.value;
+        this.$message({
+          type: 'success',
+          message: 'Установлено новое превью',
         });
       }).catch(() => {
         this.$message({

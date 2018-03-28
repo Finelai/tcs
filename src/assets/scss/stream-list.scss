@@ -1,0 +1,29 @@
+.stream-card {
+  &__preview {
+    display: block;
+    width: 320px;
+    height: 180px;
+  }
+  &__mark {
+    position: absolute;
+    top: 20px;
+    transform: translateY(-50%) translateX(30%);
+  }
+  &__follow-button {
+    text-align: right;
+  }
+  &__bottom {
+    padding: 16px;
+  }
+  &__title {
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 100%;
+    border-bottom: solid 1px #e6e6e6;
+  }
+  &__streamername {
+    a {
+      line-height: 40px;
+    }
+  }
+}
