@@ -73,6 +73,14 @@ export default {
       return randRes;
     },
   },
+  created() {
+    if (firebase.auth().currentUser) {
+      this.$router.push({
+        name: 'UserProfile',
+        params: { userId: firebase.auth().currentUser.uid },
+      });
+    }
+  },
   methods: {
     signUp() {
       firebase.auth().createUserWithEmailAndPassword(this.regForm.email, this.regForm.password).then(
@@ -96,7 +104,10 @@ export default {
             message: `Добро Пожаловать, ${this.regForm.name}`,
             type: 'success',
           });
-          this.$router.replace('user');
+          this.$router.push({
+            name: 'UserProfile',
+            params: { userId: user.uid },
+          });
         },
         (err) => {
           this.$message({

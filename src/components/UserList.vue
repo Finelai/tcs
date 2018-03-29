@@ -10,21 +10,28 @@
     <h2>Список <span v-if="!onlyStreamers">всех участников</span><span v-else>стримеров</span>, упорядоченный по рейтингу</h2>
 
     <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="3" v-if="(!onlyStreamers && !user.streamer) || user.streamer" v-for="user of orderBy(users, 'raiting', -1)" v-bind:key="user['.key']">
-        <el-card :body-style="{ padding: '0px', position: 'relative' }">
-          <img v-bind:src="user.avatar" class="image">
-          <el-badge class="mark" :value="user.raiting"/>
-          <div style="padding: 14px;">
-            <span><router-link :to="{ name: 'UserProfile', params: { userId: user['.key'] } }">{{ user.name }}</router-link></span>
-            <div class="clearfix">
-              <span v-if="user.streamer">
-                <router-link :to="{ name: 'StreamPage', params: { streamLink: user.streamer } }">Перейти на стрим</router-link>
-              </span>
-              <el-button type="text" class="button" @click="followUser">Следить</el-button>
+      <transition-group name="slide-top">
+        <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="3" v-if="(!onlyStreamers && !user.streamer) || user.streamer" v-for="user of orderBy(users, 'raiting', -1)" v-bind:key="user['.key']">
+          <el-card class="user-card" :body-style="{ padding: '0px', position: 'relative' }">
+            <img class="user-card__avatar" v-bind:src="user.avatar">
+            <el-badge class="user-card__raiting" :value="user.raiting"/>
+            <div class="user-card__bottom">
+              <span class="user-card__name"><router-link :to="{ name: 'UserProfile', params: { userId: user['.key'] } }">{{ user.name }}</router-link></span>
+              <el-row>
+                <el-col class="user-card__stream" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                  <span v-if="user.streamer">
+                    <router-link  :to="{ name: 'StreamPage', params: { streamLink: user.streamer } }">Cтрим</router-link>
+                  </span>
+                  <pre v-else></pre>
+                </el-col>
+                <el-col class="user-card__follow-button" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                  <el-button type="text" @click="followUser(user.name)">Следить</el-button>
+                </el-col>
+              </el-row>
             </div>
-          </div>
-        </el-card>
-      </el-col>
+          </el-card>
+        </el-col>
+      </transition-group>
     </el-row>
 
   </el-main>
@@ -45,9 +52,9 @@ export default {
   },
   methods: {
     // todo: реализовать follow
-    followUser() {
+    followUser(name) {
       this.$message({
-        message: 'Вы подписались на обновления участника',
+        message: `Вы подписались на обновления участника ${name}`,
         type: 'success',
       });
     },
@@ -55,30 +62,4 @@ export default {
 };
 </script>
 
-<style>
-  .button {
-    padding: 0;
-    float: right;
-  }
-
-  .mark {
-    position: absolute;
-    top: 20px;
-    transform: translateY(-50%) translateX(30%);
-  }
-
-  .image {
-    width: 100%;
-    display: block;
-  }
-
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-
-  .clearfix:after {
-      clear: both
-  }
-</style>
+<style src="../assets/scss/user-list.scss" lang="scss" scoped></style>
