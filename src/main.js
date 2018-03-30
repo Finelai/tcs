@@ -95,3 +95,29 @@ firebase.auth().onAuthStateChanged(function(user) {
     });
   }
 });
+
+
+/* Global Mixin */
+
+Vue.mixin({
+  methods: {
+    follow(type, name) {
+      if (type === 'user') {
+        this.$message({
+          message: `Вы подписались на обновления участника ${name}`,
+          type: 'success',
+        });
+      } else if (type === 'stream') {
+        this.$message({
+          message: `Вы подписались на оповещение о стриме ${name}`,
+          type: 'success',
+        });
+      } else {
+        this.$message({
+          message: 'Упс. Что-то пошло не так',
+          type: 'error',
+        });
+      }
+    },
+  },
+});

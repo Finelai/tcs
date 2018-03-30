@@ -1,35 +1,39 @@
 <template>
   <el-main class="user-profile">
 
-    <el-row type="flex" justify="end">
-      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" style="text-align:right;">
-        <el-form :inline="true">
-          <el-form-item label="Ссылка на профиль:">
-            <el-input v-model="profileLink" id="profileLink"></el-input>
-          </el-form-item>
-          <el-button @click="copyProfileLink" type="info" icon="el-icon-share">Копировать</el-button>
-        </el-form>
-      </el-col>
-    </el-row>
-    <el-row>
+    <el-row type="flex" justify="space-between">
       <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-        <el-row>
-          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-            <img width="100" v-bind:src="userAvatar">
-          </el-col>
-          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-            <span v-if="userStatus === 'offline'" class="user-status user-status--offline">.</span>
-            <span v-else class="user-status user-status--online">.</span>
-            <h1>{{ userName }}</h1>
-          </el-col>
-          <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-            <div><i class="el-icon-star-on"></i> {{ userRaiting }}</div>
-          </el-col>
-        </el-row>
+        <el-card class="user-card" :body-style="{ padding: '0px', position: 'relative' }">
+          <img class="user-card__avatar" v-bind:src="userAvatar">
+          <el-badge class="user-card__raiting" :value="userRaiting"/>
+          <div v-if="userStatus === 'offline'" class="user-card__status user-card__status--offline">.</div>
+          <div v-else class="user-card__status user-card__status--online">.</div>
+          <div class="user-card__bottom">
+            <h1 class="user-card__name">{{ userName }}</h1>
+            <el-row>
+              <el-col class="user-card__stream" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <span v-if="streamer">
+                  <router-link  :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Cтрим</router-link>
+                </span>
+                <pre v-else></pre>
+              </el-col>
+              <el-col class="user-card__follow-button" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                <el-button type="text" @click="follow('user', userName)">Следить</el-button>
+              </el-col>
+            </el-row>
+          </div>
+        </el-card>
       </el-col>
       <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-          <el-tabs type="border-card" v-if="owner">
 
+          <el-form :inline="true">
+            <el-form-item label="Ссылка на профиль:">
+              <el-input v-model="profileLink" id="profileLink"></el-input>
+            </el-form-item>
+            <el-button @click="copyProfileLink" type="info" icon="el-icon-share">Копировать</el-button>
+          </el-form>
+
+          <el-tabs type="border-card" v-if="owner">
             <el-tab-pane>
               <span slot="label"><i class="el-icon-info"></i> Информация</span>
               <el-button @click="logout" type="info">Выйти</el-button>
@@ -79,27 +83,15 @@
                 </el-form>
               </div>
             </el-tab-pane>
-
           </el-tabs>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8">
-        <el-card style="max-width:320px;margin:0 auto;" v-if="streamer" :body-style="{ padding: '0px', position: 'relative' }">
-          <img src="http://via.placeholder.com/320x180" class="image">
-          <el-badge class="mark" :value="0"/>
-          <div style="padding: 14px;">
-            <span><router-link :to="{ name: 'StreamPage', params: { streamLink: this.user.streamer } }">Перейти на стрим</router-link></span>
-            <div class="clearfix">
-              <el-button type="text" class="button" @click="followStream">Следить</el-button>
-            </div>
-          </div>
-        </el-card>
+
       </el-col>
     </el-row>
 
     <div v-if="Object.keys(comments).length === 0 ">
       <p>У этого пользователя нет ни одного комментария с положительным рейтингом</p>
     </div>
-    <div v-else class="comments" style="max-width: 1200px;margin:0 auto;">
+    <div v-else class="comments">
       <h4>Комментарии, упорядоченные по рейтингу</h4>
       <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink" style="margin-bottom: 40px;">
         <el-row type="flex" justify="end">

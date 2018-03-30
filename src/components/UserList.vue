@@ -27,7 +27,7 @@
                   <pre v-else></pre>
                 </el-col>
                 <el-col class="user-card__follow-button" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                  <el-button type="text" @click="followUser(user.name)">Следить</el-button>
+                  <el-button type="text" @click="follow('user', user.name)">Следить</el-button>
                 </el-col>
               </el-row>
             </div>
@@ -51,15 +51,6 @@ export default {
   firebase: {
     // сортируем по рейтингу
     users: usersRef.orderByChild('raiting'),
-  },
-  methods: {
-    // todo: реализовать follow
-    followUser(name) {
-      this.$message({
-        message: `Вы подписались на обновления участника ${name}`,
-        type: 'success',
-      });
-    },
   },
 };
 </script>

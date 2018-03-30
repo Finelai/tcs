@@ -15,7 +15,7 @@
                 <router-link :to="{ name: 'UserProfile', params: { userId: stream.streamerid } }">{{ stream.streamername }}</router-link>
               </el-col>
               <el-col class="stream-card__follow-button" :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
-                <el-button type="text" @click="followStream">Следить</el-button>
+                <el-button type="text" @click="follow('stream', stream.settings.title)">Следить</el-button>
               </el-col>
             </el-row>
           </div>
@@ -38,15 +38,6 @@ export default {
   firebase: {
     // сортируем по рейтингу
     streams: streamsRef.orderByChild('raiting'),
-  },
-  methods: {
-    // todo: реализовать follow
-    followStream() {
-      this.$message({
-        message: 'Вы подписались на оповещения о стриме',
-        type: 'success',
-      });
-    },
   },
 };
 </script>
