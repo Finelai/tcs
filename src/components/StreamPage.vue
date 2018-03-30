@@ -19,6 +19,7 @@
 
     <el-row>
       <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
+        <div id="video"></div>
         <el-carousel v-if="topComments.length > 0" :interval="5000" type="card" height="600px">
           <el-carousel-item v-for="topcomments in limitBy(topComments, 5)" :key="topcomments['.key']">
             <img :src="topcomments.useravatar" width="50" height="50">
@@ -216,6 +217,7 @@
 <script>
 import firebase from 'firebase';
 import { usersRef, streamsRef } from '../../config/firebase';
+// import VueScript2 from 'vue-script2';
 
 export default {
   name: 'StreamPage',
@@ -330,6 +332,22 @@ export default {
         deep: true,
       });
     }
+  },
+  mounted() {
+    // TODO: Настроить авторизацию через Twitch, чтобы работал этот код:
+    // let twitchScript = document.createElement('script');
+    // twitchScript.async = true;
+    // twitchScript.setAttribute('src', 'http://player.twitch.tv/js/embed/v1.js');
+    // document.head.appendChild(twitchScript);
+
+    // VueScript2.load('http://player.twitch.tv/js/embed/v1.js').then(() => {
+    //   let player = new Twitch.Player("video", {
+    //     width: 1280,
+    //     height: 720,
+    //     channel: "igromania",
+    //   });
+    //   player.setVolume(0.5);
+    // })
   },
   methods: {
     sendUserComment() {

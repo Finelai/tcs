@@ -89,6 +89,7 @@ export default {
           const newUserData = {
             name: this.regForm.name,
             email: user.email,
+            status: 'offline',
             avatar: `https://api.adorable.io/avatars/face/eyes${this.randomAvatar}/nose${this.randomAvatar}/mouth1/${this.randomAvatar3}`,
             raiting: 0,
             streamer: 0,

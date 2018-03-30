@@ -51,4 +51,4 @@ export default {
 };
 </script>
 
-<style src="../assets/scss/stream-list.scss" lang="scss" scoped></style>
+<style src="../assets/scss/components/stream-list.scss" lang="scss" scoped></style>

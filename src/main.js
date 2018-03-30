@@ -78,6 +78,7 @@ Vue.component(Rate.name, Rate);
 Vue.prototype.$message = Message;
 Vue.prototype.$prompt = MessageBox.prompt;
 
+// Vue.use(require('vue-script2'));
 Vue.use(VueFire);
 Vue.use(Vue2Filters);
 Vue.config.productionTip = false;

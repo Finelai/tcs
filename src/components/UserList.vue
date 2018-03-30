@@ -15,6 +15,8 @@
           <el-card class="user-card" :body-style="{ padding: '0px', position: 'relative' }">
             <img class="user-card__avatar" v-bind:src="user.avatar">
             <el-badge class="user-card__raiting" :value="user.raiting"/>
+            <div v-if="user.status === 'offline'" class="user-card__status user-card__status--offline">.</div>
+            <div v-else class="user-card__status user-card__status--online">.</div>
             <div class="user-card__bottom">
               <span class="user-card__name"><router-link :to="{ name: 'UserProfile', params: { userId: user['.key'] } }">{{ user.name }}</router-link></span>
               <el-row>
@@ -62,4 +64,4 @@ export default {
 };
 </script>
 
-<style src="../assets/scss/user-list.scss" lang="scss" scoped></style>
+<style src="../assets/scss/components/user-list.scss" lang="scss" scoped></style>

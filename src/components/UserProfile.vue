@@ -18,6 +18,8 @@
             <img width="100" v-bind:src="userAvatar">
           </el-col>
           <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+            <span v-if="userStatus === 'offline'" class="user-status user-status--offline">.</span>
+            <span v-else class="user-status user-status--online">.</span>
             <h1>{{ userName }}</h1>
           </el-col>
           <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
@@ -160,6 +162,7 @@ export default {
           { required: true, validator: validateStreamLink, trigger: 'blur' },
         ],
       },
+      userStatus: '',
       userName: '',
 
       userAvatar: '',
@@ -191,6 +194,7 @@ export default {
         usersRef.child(this.$route.params.userId),
         null,
         () => {
+          this.userStatus = this.user.status;
           this.userName = this.user.name;
           this.userAvatar = this.user.avatar;
           this.userRaiting = this.user.raiting;
@@ -362,3 +366,5 @@ export default {
   },
 };
 </script>
+
+<style src="../assets/scss/components/user-profile.scss" lang="scss" scoped></style>

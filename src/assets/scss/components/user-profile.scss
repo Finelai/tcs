@@ -1,0 +1,13 @@
+@import '../_vars.scss';
+
+.user-status {
+  font-size: 72px;
+  line-height: 0px;
+
+  &--offline {
+    color: $c_offline;
+  }
+  &--online {
+    color: $c_online;
+  }
+}

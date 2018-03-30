@@ -1,3 +1,5 @@
+@import '../_vars.scss';
+
 .user-list {
   &>.el-row {
     &>.el-col {
@@ -16,6 +18,19 @@
     position: absolute;
     top: 20px;
     transform: translateY(-50%) translateX(30%);
+  }
+  &__status {
+    position: absolute;
+    right: 20px;
+    font-size: 72px;
+    line-height: 0px;
+
+    &--offline {
+      color: $c_offline;
+    }
+    &--online {
+      color: $c_online;
+    }
   }
   &__follow-button {
     text-align: right;

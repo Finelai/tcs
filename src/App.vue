@@ -40,7 +40,7 @@
 
 <script>
 import firebase from 'firebase';
-import { db } from '../config/firebase';
+import { usersRef, db } from '../config/firebase';
 
 export default {
   data() {
@@ -53,7 +53,7 @@ export default {
     };
   },
   watch: {
-    '$route' (to, from) {
+    '$route'(to, from) {
       const toDepth = to.path.split('/').length;
       const fromDepth = from.path.split('/').length;
       this.transitionName = toDepth < fromDepth ? 'slide-top' : 'slide-bot';
@@ -62,6 +62,8 @@ export default {
   created() {
     if (firebase.auth().currentUser) {
       this.userId = firebase.auth().currentUser.uid;
+      // set user status online
+      usersRef.child(this.userId).update({ status: 'online' });
     }
     if (this.userId) {
       db.ref(`/users/${this.userId}`).once('value').then((snapshot) => {
@@ -69,6 +71,11 @@ export default {
           this.streamLink = snapshot.val().streamer;
         }
       });
+    }
+    // set user status offline
+    window.onbeforeunload = () => {
+      usersRef.child(this.userId).update({ status: 'offline' });
+      return null;
     }
   },
 };
