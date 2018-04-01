@@ -89,11 +89,11 @@
     </el-row>
 
     <div v-if="Object.keys(comments).length === 0 ">
-      <p>У этого пользователя нет ни одного комментария с положительным рейтингом</p>
+      <p>У этого пользователя пока нет ни одного лучшего комментария</p>
     </div>
     <div v-else class="comments">
-      <h4>Комментарии, упорядоченные по рейтингу</h4>
-      <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink" style="margin-bottom: 40px;">
+      <h4>Лучшие комментарии {{ userName }}, упорядоченные по рейтингу</h4>
+      <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink">
         <el-row type="flex" justify="end">
           <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" style="text-align:center;">
             <el-button type="warning" icon="el-icon-star-on">{{ streamComments.userRaitingByStream }}</el-button> <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link>
@@ -104,11 +104,14 @@
             <hr>
           </el-col>
         </el-row>
-        <el-row v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
-          <el-col :xs="4" :sm="4" :md="2" :lg="2" :xl="2" style="text-align:center;">
-            <el-button type="warning" icon="el-icon-star-on" plain>{{ oneComment.raiting }}</el-button>
+        <el-row class="comments__item one-comment" v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
+          <el-col class="one-comment__raiting" :xs="4" :sm="4" :md="2" :lg="2" :xl="2">
+            <div>
+              <i class="el-icon-star-on"></i>
+              <span>{{ oneComment.raiting }}</span>
+            </div>
           </el-col>
-          <el-col :xs="20" :sm="20" :md="22" :lg="22" :xl="22" style="text-align:left;">
+          <el-col class="one-comment__text" :xs="20" :sm="20" :md="22" :lg="22" :xl="22">
             <p>{{ oneComment.comment }}</p>
           </el-col>
         </el-row>
@@ -228,6 +231,37 @@ export default {
         },
       );
     }
+  },
+  updated() {
+    // функция для подкрашивания рейтинга в цвет в зависимости от его величины
+    this.$nextTick(function () {
+      const allRaitings = document.querySelectorAll('.one-comment__raiting>div');
+      const allRaitingsLength = allRaitings.length;
+      console.log(allRaitingsLength);
+      for (let n = 0; n < allRaitingsLength; n++) {
+        const curRaiting = allRaitings[n].firstElementChild.nextElementSibling.innerText;
+        if (curRaiting > 9) {
+          // uncommon (green)
+          let raitingColor = `rgb(0,1${curRaiting},77)`;
+
+          if (curRaiting > 99 && curRaiting < 200) {
+            // rare (blue)
+            raitingColor = `rgb(0,100,${curRaiting})`;
+          } else if (curRaiting > 199 && curRaiting < 300) {
+            // epic (magenta)
+            raitingColor = `rgb(150,0,${curRaiting - 50})`;
+          } else if (curRaiting > 299 && curRaiting < 500) {
+            // hot (red)
+            raitingColor = `rgb(${curRaiting - 250},0,0)`;
+          } else if (curRaiting > 499) {
+            // legendary (gold)
+            raitingColor = '#DB9E1C';
+          }
+
+          allRaitings[n].style.color = raitingColor;
+        }
+      }
+    });
   },
   methods: {
     logout() {
