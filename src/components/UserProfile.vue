@@ -94,9 +94,15 @@
     <div v-else class="comments">
       <h4>Лучшие комментарии {{ userName }}, упорядоченные по рейтингу</h4>
       <div v-for="streamComments in orderBy(comments, 'userRaitingByStream', -1)" v-bind:key="streamComments.streamLink">
-        <el-row type="flex" justify="end">
-          <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" style="text-align:center;">
-            <el-button type="warning" icon="el-icon-star-on">{{ streamComments.userRaitingByStream }}</el-button> <router-link :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link>
+        <el-row class="comments__stream" type="flex" justify="end">
+          <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+            <div class="comments__stream-block">
+              <div class="comments__stream-raiting raiting_colorize">
+                <i class="el-icon-star-on"></i>
+                <span>{{ streamComments.userRaitingByStream }}</span>
+              </div>
+              <router-link class="comments__stream-link" :to="{ name: 'StreamPage', params: { streamLink: streamComments.streamLink } }">{{ streamComments.streamTitle }}</router-link>
+            </div>
           </el-col>
         </el-row>
         <el-row>
@@ -106,12 +112,12 @@
         </el-row>
         <el-row class="comments__item one-comment" v-if="oneComment.userid === $route.params.userId" v-for="(oneComment, index) in orderBy(streamComments.userComments, 'raiting', -1)" v-bind:key="index">
           <el-col class="one-comment__raiting" :xs="4" :sm="4" :md="2" :lg="2" :xl="2">
-            <div>
+            <div class="raiting_colorize">
               <i class="el-icon-star-on"></i>
               <span>{{ oneComment.raiting }}</span>
             </div>
           </el-col>
-          <el-col class="one-comment__text" :xs="20" :sm="20" :md="22" :lg="22" :xl="22">
+          <el-col class="one-comment__text" :xs="20" :sm="20" :md="14" :lg="14" :xl="14">
             <p>{{ oneComment.comment }}</p>
           </el-col>
         </el-row>
@@ -235,9 +241,8 @@ export default {
   updated() {
     // функция для подкрашивания рейтинга в цвет в зависимости от его величины
     this.$nextTick(function () {
-      const allRaitings = document.querySelectorAll('.one-comment__raiting>div');
+      const allRaitings = document.querySelectorAll('.raiting_colorize');
       const allRaitingsLength = allRaitings.length;
-      console.log(allRaitingsLength);
       for (let n = 0; n < allRaitingsLength; n++) {
         const curRaiting = allRaitings[n].firstElementChild.nextElementSibling.innerText;
         if (curRaiting > 9) {

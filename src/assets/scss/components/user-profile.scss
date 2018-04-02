@@ -53,21 +53,31 @@
   }
 
 .comments {
-  &__item {
-    margin-bottom: 20px;
-  }
-}
+  &__stream {
+    position: relative;
+    z-index: 100;
+    top: 1.25em;
 
-.one-comment {
-  &__raiting {
-    text-align: center;
-
-    div {
-      min-width: 100px;
+    &>div {
+      padding-left: 50px;
     }
   }
-  &__text {
-    text-align: left;
+  &__stream-block {
+    display: inline-block;
+    background-color: $c_bg_white;
+    padding: 0 24px;
+  }
+  &__stream-raiting {
+    display: inline-block;
+    min-width: 100px;
+    text-align: center;
+  }
+  &__stream-link {
+    display: inline-block;
+    line-height: 1.5em;
+  }
+  &__item {
+    margin-bottom: 20px;
   }
 }
 

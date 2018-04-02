@@ -34,6 +34,7 @@ import {
   Icon,
   Carousel,
   CarouselItem,
+  Loading,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -75,8 +76,12 @@ Vue.component(TableColumn.name, TableColumn);
 Vue.component(Badge.name, Badge);
 Vue.component(Card.name, Card);
 Vue.component(Rate.name, Rate);
+
+Vue.use(Loading.directive);
+
 Vue.prototype.$message = Message;
 Vue.prototype.$prompt = MessageBox.prompt;
+Vue.prototype.$loading = Loading.service;
 
 // Vue.use(require('vue-script2'));
 Vue.use(VueFire);
