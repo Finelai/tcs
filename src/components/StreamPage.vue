@@ -1,69 +1,61 @@
 <template>
   <el-main class="stream-page">
 
-    <el-row type="flex" justify="end">
-      <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="8" style="text-align:right;">
-        <el-form :inline="true">
-          <el-form-item label="Ссылка на стрим:">
-            <el-input v-model="streamLink" id="streamLink"></el-input>
-          </el-form-item>
-          <el-button @click="copyStreamLink" type="info" icon="el-icon-share">Копировать</el-button>
-        </el-form>
-      </el-col>
-    </el-row>
-
-    <div style="text-align:center;display:inline-block;width:100%">
-      <i class="el-icon-star-on"></i> <span>{{ streamRaiting }}</span> <h1>{{ streamTitle }}</h1>
+    <div class="stream-page__header">
+      <h1><span class="raiting_colorize"><i class="el-icon-star-on"></i> <span>{{ streamRaiting }}</span></span> {{ streamTitle }}</h1>
       <el-button v-if="owner" type="text" @click="updateStreamTitle">Сменить заголовок</el-button>
     </div>
 
     <el-row>
       <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
         <div id="video"></div>
-        <el-carousel v-if="topComments.length > 0" :interval="5000" type="card" height="600px">
+        <el-carousel class="stream-page__video" v-if="topComments.length > 0" :interval="5000" type="card" height="600px">
           <el-carousel-item v-for="topcomments in limitBy(topComments, 5)" :key="topcomments['.key']">
             <img :src="topcomments.useravatar" width="50" height="50">
             <p><strong>{{ topcomments.username }}:</strong> <br> {{ topcomments.comment }}</p>
           </el-carousel-item>
         </el-carousel>
-        <el-carousel v-else :interval="5000" type="card" height="600px">
+        <el-carousel class="stream-page__video" v-else :interval="5000" type="card" height="600px">
           <el-carousel-item>
             <p>На этом стриме еще нет ни одного Лучшего комментария за все время</p>
           </el-carousel-item>
         </el-carousel>
-        <p v-html="streamDesc"></p>
-        <el-button v-if="owner" type="text" @click="editStreamDesc = !editStreamDesc">Сменить описание</el-button>
-        <div v-if="editStreamDesc">
-          <textarea cols="30" rows="10" v-model="newStreamDesc"></textarea>
-          <button @click="updateStreamDesc">Сохранить</button>
+        <el-form :inline="true">
+          <el-form-item label="Ссылка на стрим:">
+            <el-input v-model="streamLink" id="streamLink"></el-input>
+          </el-form-item>
+          <el-button @click="copyStreamLink" type="info" icon="el-icon-share">Копировать</el-button>
+        </el-form>
+        <div class="stream-page__desc">
+          <p v-html="streamDesc"></p>
+          <el-button v-if="owner" type="text" @click="editStreamDesc = !editStreamDesc">Сменить описание</el-button>
+          <div v-if="editStreamDesc">
+            <textarea cols="30" rows="10" v-model="newStreamDesc"></textarea>
+            <button @click="updateStreamDesc">Сохранить</button>
+          </div>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-        <div class="comments">
-          <h6><i class="el-icon-info"></i> Оценивайте комментарии. У вас есть только 1 лайк и 1 дислайк в раунде.</h6>
-          <div v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid" style="margin-bottom:30px;">
-            <el-row>
+        <div class="stream-page__comments">
+          <p><i class="el-icon-info"></i> Оценивайте комментарии. У вас есть только 1 лайк и 1 дислайк за раунд.</p>
+          <div class="one-comment" v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid" style="margin-bottom:30px;">
+            <el-row class="one-comment__avatar">
               <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
               <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
                 <img width="25" height="25" v-bind:src="comment.useravatar" style="vertical-align:bottom"><span>{{ comment.username }}:</span>
               </el-col>
             </el-row>
             <el-row>
-              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
-                <el-rate
-                  v-model="comment.raiting"
-                  disabled
-                  show-score
-                  :low-threshold="10"
-                  :high-threshold="50"
-                  :max="1"
-                  :colors="['#99A9BF', '#FF9900', '#ff6969']">
-                </el-rate>
+              <el-col class="one-comment__raiting" :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
+                <div class="raiting_colorize">
+                  <i class="el-icon-star-on"></i>
+                  <span>{{ comment.raiting }}</span>
+                </div>
               </el-col>
-              <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+              <el-col class="one-comment__text" :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
                 <p>{{ comment.comment }}</p>
               </el-col>
-              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4" v-if="comment.userid !== userId">
+              <el-col class="one-comment__vote" :xs="4" :sm="4" :md="4" :lg="4" :xl="4" v-if="comment.userid !== userId">
                 <div v-if="stream.temp.liked[userId] !== undefined">
                   <el-button v-if="stream.temp.liked[userId].like === undefined" type="success" icon="el-icon-caret-top" size="mini" @click="commentLike(comment.userid)"></el-button>
                   <el-button v-if="stream.temp.liked[userId].dislike === undefined" type="danger" icon="el-icon-caret-bottom" size="mini" @click="commentDislike(comment.userid)"></el-button>
@@ -593,26 +585,4 @@ export default {
 };
 </script>
 
-<style>
-  .el-carousel__item img {
-    width: 100%;
-    height: 100%;
-    opacity: .1;
-  }
-  .el-carousel__item p {
-    color: #000;
-    opacity: 0.75;
-    margin: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateY(-50%) translateX(-50%);
-  }
-  .el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-  }
-
-  .el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
-  }
-</style>
+<style src="../assets/scss/components/stream-page.scss" lang="scss" scoped></style>

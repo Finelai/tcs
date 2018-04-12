@@ -1,0 +1,44 @@
+@import '../_vars.scss';
+
+.stream-page {
+  &__header {
+    text-align:center;
+    display:inline-block;
+    width:100%;
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .el-button {
+      padding: 0;
+      position: relative;
+      bottom: 20px;
+    }
+  }
+  &__video {
+    padding-right: 24px;
+  }
+}
+
+.el-carousel__item img {
+  width: 100%;
+  height: 100%;
+  opacity: .1;
+}
+.el-carousel__item p {
+  color: #000;
+  opacity: 0.75;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+.el-carousel__item:nth-child(2n+1) {
+  background-color: #d3dce6;
+}

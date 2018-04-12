@@ -83,3 +83,31 @@
 
 }
 
+.one-comment {
+  &__raiting {
+    text-align: right;
+
+    div {
+      text-align: center;
+      min-width: 100px;
+      margin: 16px 0;
+      padding: 24px;
+
+      i, span {
+        font-size: 1.5rem;
+      }
+    }
+  }
+  &__text {
+    text-align: left;
+
+    p {
+      width: 100%;
+      display: inline-block;
+      background-color: $c_comment_bg;
+      color: $c_text_white;
+      line-height: 1.5em;
+      padding: 24px;
+    }
+  }
+}

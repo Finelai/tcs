@@ -238,36 +238,6 @@ export default {
       );
     }
   },
-  updated() {
-    // функция для подкрашивания рейтинга в цвет в зависимости от его величины
-    this.$nextTick(function () {
-      const allRaitings = document.querySelectorAll('.raiting_colorize');
-      const allRaitingsLength = allRaitings.length;
-      for (let n = 0; n < allRaitingsLength; n++) {
-        const curRaiting = allRaitings[n].firstElementChild.nextElementSibling.innerText;
-        if (curRaiting > 9) {
-          // uncommon (green)
-          let raitingColor = `rgb(0,1${curRaiting},77)`;
-
-          if (curRaiting > 99 && curRaiting < 200) {
-            // rare (blue)
-            raitingColor = `rgb(0,100,${curRaiting})`;
-          } else if (curRaiting > 199 && curRaiting < 300) {
-            // epic (magenta)
-            raitingColor = `rgb(150,0,${curRaiting - 50})`;
-          } else if (curRaiting > 299 && curRaiting < 500) {
-            // hot (red)
-            raitingColor = `rgb(${curRaiting - 250},0,0)`;
-          } else if (curRaiting > 499) {
-            // legendary (gold)
-            raitingColor = '#DB9E1C';
-          }
-
-          allRaitings[n].style.color = raitingColor;
-        }
-      }
-    });
-  },
   methods: {
     logout() {
       firebase.auth().signOut().then(() => {
