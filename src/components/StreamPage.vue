@@ -8,6 +8,8 @@
 
     <el-row>
       <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
+
+        <!-- Video -->
         <div id="video"></div>
         <el-carousel class="stream-page__video" v-if="topComments.length > 0" :interval="5000" type="card" height="600px">
           <el-carousel-item v-for="topcomments in limitBy(topComments, 5)" :key="topcomments['.key']">
@@ -20,12 +22,23 @@
             <p>На этом стриме еще нет ни одного Лучшего комментария за все время</p>
           </el-carousel-item>
         </el-carousel>
-        <el-form :inline="true">
-          <el-form-item label="Ссылка на стрим:">
-            <el-input v-model="streamLink" id="streamLink"></el-input>
-          </el-form-item>
-          <el-button @click="copyStreamLink" type="info" icon="el-icon-share">Копировать</el-button>
-        </el-form>
+
+        <!-- Share -->
+        <el-popover
+          ref="share"
+          placement="bottom"
+          width="320"
+          trigger="click">
+          <el-form class="share" :inline="true">
+            <el-form-item class="share__input" label="Ссылка на стрим:">
+              <el-input v-model="streamLink" id="streamLink"></el-input>
+            </el-form-item>
+            <el-button class="share_button" @click="copyStreamLink" type="info" icon="el-icon-share">Копировать</el-button>
+          </el-form>
+        </el-popover>
+        <el-button v-popover:share>Поделиться</el-button>
+
+        <!-- Description -->
         <div class="stream-page__desc">
           <p v-html="streamDesc"></p>
           <el-button v-if="owner" type="text" @click="editStreamDesc = !editStreamDesc">Сменить описание</el-button>
@@ -34,15 +47,18 @@
             <button @click="updateStreamDesc">Сохранить</button>
           </div>
         </div>
+
       </el-col>
-      <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-        <div class="stream-page__comments">
-          <p><i class="el-icon-info"></i> Оценивайте комментарии. У вас есть только 1 лайк и 1 дислайк за раунд.</p>
-          <div class="one-comment" v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid" style="margin-bottom:30px;">
+      <el-col class="stream-page__comments comments-section" :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+        <div class="comments-section__items">
+          <p class="comments-section__warning"><i class="el-icon-info"></i> Оценивайте комментарии. У вас есть только 1 лайк и 1 дислайк за раунд.</p>
+          <div class="one-comment" v-for="comment in orderBy(comments, 'raiting', -1)" v-bind:key="comment.userid">
             <el-row class="one-comment__avatar">
-              <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
-              <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
-                <img width="25" height="25" v-bind:src="comment.useravatar" style="vertical-align:bottom"><span>{{ comment.username }}:</span>
+              <el-col :offset="4" :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
+                <img width="25" height="25" v-bind:src="comment.useravatar">
+                <span>
+                  <router-link :to="{ name: 'UserProfile', params: { userId: comment.userid } }">{{ comment.username }}</router-link>:
+                </span>
               </el-col>
             </el-row>
             <el-row>
@@ -52,10 +68,10 @@
                   <span>{{ comment.raiting }}</span>
                 </div>
               </el-col>
-              <el-col class="one-comment__text" :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
+              <el-col class="one-comment__text" :xs="18" :sm="18" :md="18" :lg="18" :xl="18">
                 <p>{{ comment.comment }}</p>
               </el-col>
-              <el-col class="one-comment__vote" :xs="4" :sm="4" :md="4" :lg="4" :xl="4" v-if="comment.userid !== userId">
+              <el-col class="one-comment__vote" :xs="2" :sm="2" :md="2" :lg="2" :xl="2" v-if="comment.userid !== userId">
                 <div v-if="stream.temp.liked[userId] !== undefined">
                   <el-button v-if="stream.temp.liked[userId].like === undefined" type="success" icon="el-icon-caret-top" size="mini" @click="commentLike(comment.userid)"></el-button>
                   <el-button v-if="stream.temp.liked[userId].dislike === undefined" type="danger" icon="el-icon-caret-bottom" size="mini" @click="commentDislike(comment.userid)"></el-button>
@@ -69,9 +85,9 @@
           </div>
         </div>
 
-        <p>Осталось до конца раунда: <span>{{ cdRoundTime }}</span> {{ roundend }}</p>
+        <p class="comments-section__warning">Осталось до конца раунда: <span>{{ cdRoundTime }}</span> {{ roundend }}</p>
 
-        <div class="streamer-settings" v-if="owner">
+        <div v-if="owner" class="comments-section__settings">
           <h3>Управление</h3>
           <el-button type="success" @click="startStream">Начать стрим</el-button>
           <el-button type="danger" @click="endStream">Завершить стрим</el-button>
@@ -83,36 +99,37 @@
           <el-button type="primary" @click="updatePreview">Сменить превью</el-button>
         </div>
 
-        <div class="user-commentform" v-else>
-          <img width="25" height="25" v-bind:src="userAvatar"><span>{{ userName }}:</span>
-          <el-row>
-            <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
+        <!-- Send Comment -->
+        <div v-else class="comments-section__send">
+          <div class="send-form">
+            <div class="send-form__comment">
+              <img class="send-form__avatar" v-bind:src="userAvatar">
               <el-input
                 type="textarea"
-                :autosize="{ minRows: 1, maxRows: 2}"
+                :autosize="{ minRows: 1, maxRows: 3}"
                 resize="none"
-                placeholder="Напишите свой комментарий"
+                placeholder="Напишите комментарий"
                 v-model="userComment">
               </el-input>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
-              <el-button v-if="userComment !== ''" type="primary" size="small" @click="sendUserComment">Отправить</el-button>
-              <el-button v-else type="primary" size="small" disabled>Отправить</el-button>
-            </el-col>
-          </el-row>
-          <h6><i class="el-icon-info"></i> Вы можете отправить только 1 комментарий за раунд</h6>
+            </div>
+            <div class="send-form__btn-submit">
+              <el-button :disabled="userComment === ''" type="primary" size="small" @click="sendUserComment">Отправить</el-button>
+            </div>
+          </div>
+          <p class="comments-section__warning"><i class="el-icon-info"></i> Вы можете отправить только 1 комментарий за раунд</p>
         </div>
+
       </el-col>
     </el-row>
 
     <el-row class="current">
       <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="streamCurrentComments.length > 0" class="current-topcomments">
         <h3>Лучшие комментарии текущего стрима</h3>
-        <div v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']" style="margin-bottom:30px;">
+        <div v-for="comment in limitBy(orderBy(streamCurrentComments, 'raiting', -1), 10)" v-bind:key="comment['.key']">
           <el-row>
             <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
             <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
-              <img width="25" height="25" v-bind:src="comment.useravatar" style="vertical-align:bottom"><span>{{ comment.username }}:</span>
+              <img width="25" height="25" v-bind:src="comment.useravatar"><span>{{ comment.username }}:</span>
             </el-col>
           </el-row>
           <el-row>
@@ -127,7 +144,7 @@
                 :colors="['#99A9BF', '#FF9900', '#ff6969']">
               </el-rate>
             </el-col>
-            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
               <p>{{ comment.comment }}</p>
             </el-col>
           </el-row>
@@ -135,7 +152,7 @@
       </el-col>
       <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="streamCurrentUsers.length > 0" class="current-topusers">
         <h3>Лучшие комментаторы текущего стрима</h3>
-        <el-row v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']" style="margin-bottom:30px;">
+        <el-row v-for="user in limitBy(orderBy(streamCurrentUsers, 'raiting', -1), 5)" v-bind:key="user['.key']">
           <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
             <el-rate
               v-model="user.raiting"
@@ -148,7 +165,10 @@
             </el-rate>
           </el-col>
           <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
-            <img width="40" height="40" v-bind:src="user.avatar" style="vertical-align:bottom"><span>{{ user.name }}</span>
+            <img width="40" height="40" v-bind:src="user.avatar">
+            <span>
+              <router-link :to="{ name: 'UserProfile', params: { userId: user['.key'] } }">{{ user.name }}</router-link>
+            </span>
           </el-col>
         </el-row>
       </el-col>
@@ -157,11 +177,11 @@
     <el-row class="top">
       <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="topComments.length > 0" class="topcomments">
         <h3>Лучшие комментарии за все время</h3>
-        <div v-for="topcomment in limitBy(orderBy(topComments, 'raiting', -1), 10)" v-bind:key="topcomment['.key']" style="margin-bottom:30px;">
+        <div v-for="topcomment in limitBy(orderBy(topComments, 'raiting', -1), 10)" v-bind:key="topcomment['.key']">
           <el-row>
             <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4"><pre></pre></el-col>
             <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
-              <img width="25" height="25" v-bind:src="topcomment.useravatar" style="vertical-align:bottom"><span>{{ topcomment.username }}:</span>
+              <img width="25" height="25" v-bind:src="topcomment.useravatar"><span>{{ topcomment.username }}:</span>
             </el-col>
           </el-row>
           <el-row>
@@ -176,7 +196,7 @@
                 :colors="['#99A9BF', '#FF9900', '#ff6969']">
               </el-rate>
             </el-col>
-            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16" style="background-color:#66b1ff;">
+            <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
               <p>{{ topcomment.comment }}</p>
             </el-col>
           </el-row>
@@ -184,7 +204,7 @@
       </el-col>
       <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" v-if="topUsers.length > 0" class="topusers">
         <h3>Лучшие комментаторы за все время</h3>
-        <el-row v-for="topuser in limitBy(orderBy(topUsers, 'raiting', -1), 10)" v-bind:key="topuser['.key']" style="margin-bottom:30px;">
+        <el-row v-for="topuser in limitBy(orderBy(topUsers, 'raiting', -1), 10)" v-bind:key="topuser['.key']">
           <el-col :xs="4" :sm="4" :md="4" :lg="4" :xl="4">
             <el-rate
               v-model="topuser.raiting"
@@ -197,7 +217,10 @@
             </el-rate>
           </el-col>
           <el-col :xs="20" :sm="20" :md="20" :lg="20" :xl="20">
-            <img width="40" height="40" v-bind:src="topuser.avatar" style="vertical-align:bottom"><span>{{ topuser.name }}</span>
+            <img width="40" height="40" v-bind:src="topuser.avatar">
+            <span>
+              <router-link :to="{ name: 'UserProfile', params: { userId: topuser['.key'] } }">{{ topuser.name }}</router-link>
+            </span>
           </el-col>
         </el-row>
       </el-col>

@@ -35,6 +35,7 @@ import {
   Carousel,
   CarouselItem,
   Loading,
+  Popover,
 } from 'element-ui';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
@@ -76,6 +77,7 @@ Vue.component(TableColumn.name, TableColumn);
 Vue.component(Badge.name, Badge);
 Vue.component(Card.name, Card);
 Vue.component(Rate.name, Rate);
+Vue.component(Popover.name, Popover);
 
 Vue.use(Loading.directive);
 

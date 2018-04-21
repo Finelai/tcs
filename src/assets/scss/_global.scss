@@ -50,3 +50,14 @@ a {
     text-decoration: none;
   }
 }
+
+
+/* Share component */
+
+.share {
+  &__input {
+    &>div {
+      width: 100%;
+    }
+  }
+}
